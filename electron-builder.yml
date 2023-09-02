@@ -12,6 +12,8 @@ asarUnpack:
   - resources/**
 win:
   executableName: page-replacement-algorithm
+  target:
+    - portable
 nsis:
   artifactName: ${name}-${version}-setup.${ext}
   shortcutName: ${productName}
