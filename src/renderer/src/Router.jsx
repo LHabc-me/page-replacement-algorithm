@@ -1,5 +1,5 @@
 import { Route, Routes } from "react-router-dom";
-import { Button } from "@fluentui/react-components";
+import { Button, Select } from "@fluentui/react-components";
 
 function Router() {
   return (
@@ -22,7 +22,13 @@ const Home = (props) => {
 };
 
 const About = (props) => {
-  return <div>About Compontent</div>;
+  return (
+    <Select>
+      <option>Red</option>
+      <option>Green</option>
+      <option>Blue</option>
+    </Select>
+  );
 };
 
 export default Router;
