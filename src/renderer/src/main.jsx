@@ -1,14 +1,14 @@
 import React from "react";
 import "./assets/index.css";
 import ReactDOM from "react-dom";
-import { FluentProvider, webLightTheme } from "@fluentui/react-components";
 import { BrowserRouter } from "react-router-dom";
 import Router from "./Router";
+import { ThemeProvider } from "./components/ThemeContext";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
-  <BrowserRouter>
-    <FluentProvider theme={webLightTheme} className={"h-screen"}>
-      <Router></Router>
-    </FluentProvider>
-  </BrowserRouter>
+  <ThemeProvider>
+    <BrowserRouter>
+      <Router />
+    </BrowserRouter>
+  </ThemeProvider>
 );
