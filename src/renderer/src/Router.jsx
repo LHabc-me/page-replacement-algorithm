@@ -1,11 +1,12 @@
 import { Route, Routes } from "react-router-dom";
 import { Button, Select } from "@fluentui/react-components";
+import Nav from "./Nav";
 
 function Router() {
   return (
     <Routes>
       <Route path="*" element={<Home />} />
-      <Route path="/" element={<Home />} />
+      <Route path="/" element={<Nav />} />
       <Route path="/about" element={<About />} />
     </Routes>
   );
@@ -13,7 +14,7 @@ function Router() {
 
 const Home = (props) => {
   return (
-    <div className={"grid h-screen bg-black"}>
+    <div className={"grid h-screen bg-white"}>
       <Button appearance={"primary"} className={"place-self-center"}>
         Home Compontent
       </Button>

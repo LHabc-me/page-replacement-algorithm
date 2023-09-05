@@ -1,9 +1,7 @@
 import React from "react";
 import "./assets/index.css";
 import ReactDOM from "react-dom";
-import { FluentProvider, webLightTheme, Button } from "@fluentui/react-components";
-import { Nav } from "./Nav";
-import { VerticalDivider } from "./VerticalDivider";
+import { FluentProvider, webLightTheme } from "@fluentui/react-components";
 import { BrowserRouter } from "react-router-dom";
 import Router from "./Router";
 

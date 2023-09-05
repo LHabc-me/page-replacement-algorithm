@@ -22,9 +22,6 @@ export const VerticalDivider = () => {
   const styles = useStyles();
   return (
     <div className={styles.root}>
-      {/*<div className={styles.example}>*/}
-      {/*  <Divider vertical style={{ height: "100%" }} />*/}
-      {/*</div>*/}
       <div className={styles.example}>
         <Divider vertical style={{ height: "100%" }} appearance="subtle">
         </Divider>
