@@ -80,4 +80,4 @@ function replacePageCLOCK(pageTableEntry, pageTable, workingSet) {
   return replacedPageTableEntry;
 }
 
-module.exports = { replacePage, PAGE_REPLACEMENT_ALGORITHMS };
+export { replacePage, PAGE_REPLACEMENT_ALGORITHMS };

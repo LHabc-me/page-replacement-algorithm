@@ -15,4 +15,4 @@ function generateRandomUniqueIntsExcept(count, min = 0, max = Number.MAX_VALUE, 
   return [...set].filter(item => !except.includes(item));
 }
 
-module.exports = { generateUniqueRandomInts, generateRandomUniqueIntsExcept };
+export { generateUniqueRandomInts, generateRandomUniqueIntsExcept };

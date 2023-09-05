@@ -1,5 +1,5 @@
-const { generateUniqueRandomInt, generateRandomUniqueIntsExcept } = require("./utils");
-const { replacePage, PAGE_REPLACEMENT_ALGORITHMS } = require("./core");
+import { generateUniqueRandomInt, generateRandomUniqueIntsExcept } from "./utils";
+import { replacePage, PAGE_REPLACEMENT_ALGORITHMS } from "./core";
 
 // 页表项
 class PageTableEntry {
