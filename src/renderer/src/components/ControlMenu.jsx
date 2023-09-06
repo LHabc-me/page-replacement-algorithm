@@ -13,10 +13,10 @@ function SecondaryMenu(props) {
     pageSize,
     workingSetCount,
     algorithm,
-    setLogicalPageCount,
-    setPageSize,
-    setWorkingSetCount,
-    setAlgorithm,
+    onLogicalPageCountChange,
+    onPageSizeChange,
+    onWorkingSetCountChange,
+    onAlgorithmChange,
 
     enableSettings
   } = props;
@@ -34,7 +34,7 @@ function SecondaryMenu(props) {
       <PopoverSurface>
         <div className={"flex flex-col"}>
           <TabList className={"w-100"} size={"small"} appearance={"subtle"} selectedValue={algorithm}
-                   onTabSelect={(_, data) => setAlgorithm(data.value)}
+                   onTabSelect={onAlgorithmChange}
                    disabled={!enableSettings}>
             <Tab value={"FIFO"}>FIFO</Tab>
             <Tab value={"LRU"}>LRU</Tab>
@@ -44,17 +44,17 @@ function SecondaryMenu(props) {
 
           <Label htmlFor={logicalPageCountLabelId}>逻辑页面总数<span className={"float-right mr-2"}>{logicalPageCount}</span></Label>
           <Slider value={logicalPageCount} step={1} min={1} max={12} id={logicalPageCountLabelId}
-                  onChange={(_, data) => setLogicalPageCount(data.value)}
+                  onChange={onLogicalPageCountChange}
                   disabled={!enableSettings} />
 
           <Label htmlFor={pageSizeLabelId}>逻辑页面大小<span className={"float-right mr-2"}>{pageSize}字节</span></Label>
           <Slider value={pageSize} step={1024} min={1024} max={4096 * 2} id={pageSizeLabelId}
-                  onChange={(_, data) => setPageSize(data.value)}
+                  onChange={onPageSizeChange}
                   disabled={!enableSettings} />
 
           <Label htmlFor={workingSetCountLabelId}>工作集大小<span className={"float-right mr-2"}>{workingSetCount}</span></Label>
           <Slider value={workingSetCount} step={1} min={1} max={12} id={workingSetCountLabelId}
-                  onChange={(_, data) => setWorkingSetCount(data.value)}
+                  onChange={onWorkingSetCountChange}
                   disabled={!enableSettings} />
 
           <div className={"flex flex-row"}>

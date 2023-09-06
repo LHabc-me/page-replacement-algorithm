@@ -14,7 +14,7 @@ function Router() {
   return (
     <Routes>
       <Route path="*" element={<Home />} />
-      <Route path="/" element={<AutoMenu />} />
+      <Route path="/" element={Tab} />
       <Route path="/about" element={<About />} />
     </Routes>
   );
@@ -41,12 +41,12 @@ const About = (props) => {
                  pageSize={pageSize}
                  workingSetCount={workingSetCount}
                  algorithm={algorithm}
-                 setLogicalPageCount={setLogicalPageCount}
-                 setPageSize={setPageSize}
-                 setWorkingSetCount={setWorkingSetCount}
-                 setAlgorithm={setAlgorithm}
+                 onLogicalPageCountChange={(_, data) => setLogicalPageCount(data.value)}
+                 onPageSizeChange={(_, data) => setPageSize(data.value)}
+                 onWorkingSetCountChange={(_, data) => setWorkingSetCount(data.value)}
+                 onAlgorithmChange={(_, data) => setAlgorithm(data.value)}
                  trigger={<Button className={"float-right"}>设置</Button>} />
   );
 };
 
-export default Router;
+export { Router };
