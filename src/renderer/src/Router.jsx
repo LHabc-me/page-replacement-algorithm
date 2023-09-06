@@ -1,6 +1,9 @@
-import { Route, Routes } from "react-router-dom";
+import { Link, Route, Routes } from "react-router-dom";
 import { Button, Select } from "@fluentui/react-components";
 import { TabView } from "./components/TabView";
+import * as React from "react";
+import { SinglePage } from "./SinglePage";
+import { AutoMenu } from "./compoments/AutoMenu";
 
 function Router() {
   const Tab = <TabView windows={[]}
@@ -11,9 +14,8 @@ function Router() {
   return (
     <Routes>
       <Route path="*" element={<Home />} />
-      <Route path="/" element={Tab}>
-        <Route path="/about" element={<About />} />
-      </Route>
+      <Route path="/" element={<AutoMenu />} />
+      <Route path="/about" element={<About />} />
     </Routes>
   );
 }
@@ -22,7 +24,7 @@ const Home = (props) => {
   return (
     <div className={"grid h-screen bg-white"}>
       <Button appearance={"primary"} className={"place-self-center"}>
-        Home Compontent
+        Home Component
       </Button>
     </div>
   );
@@ -30,11 +32,15 @@ const Home = (props) => {
 
 const About = (props) => {
   return (
-    <Select>
-      <option>Red</option>
-      <option>Green</option>
-      <option>Blue</option>
-    </Select>
+    <>
+      <Select>
+        <option>Red</option>
+        <option>Green</option>
+        <option>Blue</option>
+      </Select>
+      <Button>
+        <Link to={"/"}>Return</Link>
+      </Button></>
   );
 };
 
