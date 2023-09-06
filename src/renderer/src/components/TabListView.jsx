@@ -3,22 +3,23 @@ import { Button, TabList, Tab } from "@fluentui/react-components";
 import { Add12Regular, Dismiss12Regular } from "@fluentui/react-icons";
 import { AnimatePresence, motion } from "framer-motion";
 
-function TabView(props) {
+function TabListView(props) {
   const { windows, newWindow } = props;
   const [id, setId] = useState(0);
-  const [tabs, setTabs] = useState(windows.map((window, index) => {
+  const [tabs, setTabs] = useState(windows.map((window) => {
     const o = { ...window, id };
     setId(id + 1);
     return o;
   }));
   const [selectedTabId, setSelectedTabId] = useState(-1);
   const ActiveTabComponent = tabs.find((tab) => tab.id === selectedTabId)?.component ?? <div>Not Found</div>;
+  const [openedTabsId, setOpenedTabsId] = useState([]);
   return (
     <div>
       <div className={"flex flex-row"}>
         <TabList defaultSelectedValue={0}
                  selectedValue={selectedTabId}>
-          {tabs.map((tab, index) => {
+          {tabs.map(tab => {
             return (
               <Tab key={tab.id}
                    value={tab.id}
@@ -26,6 +27,7 @@ function TabView(props) {
                    onClick={() => {
                      if (selectedTabId !== tab.id) {
                        setSelectedTabId(tab.id);
+                       setOpenedTabsId([...openedTabsId, tab.id]);
                      }
                    }}
                    className={"h-8 w-40"}
@@ -34,16 +36,17 @@ function TabView(props) {
                   <span className={"w-80"}>{tab.title}</span>
                   {tab.id === selectedTabId ? <motion.div className={"underline"} layoutId={"underline"} /> : null}
                   {/* 删除标签页 */}
-                  <Button
-                    appearance={"subtle"}
-                    size={"small"}
-                    onClick={(event) => {
-                      event.stopPropagation();
-                      setTabs(tabs.filter((t) => t.id !== tab.id));
-                      setSelectedTabId(-1);
-                    }}
-                    icon={<Dismiss12Regular />}
-                    tabIndex={-1}
+                  <Button appearance={"subtle"}
+                          size={"small"}
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            setTabs(tabs.filter((t) => t.id !== tab.id));
+                            const opened = openedTabsId.filter((t) => t !== tab.id);
+                            setOpenedTabsId(opened.filter((t) => t !== tab.id));
+                            setSelectedTabId(opened[opened.length - 1] ?? -1);
+                          }}
+                          icon={<Dismiss12Regular />}
+                          tabIndex={-1}
                   ></Button>
                 </div>
               </Tab>
@@ -58,7 +61,7 @@ function TabView(props) {
                   setId(id + 1);
                   setTabs([...tabs, newTab]);
                   setSelectedTabId(newTab.id);
-                  console.log(tabs);
+                  setOpenedTabsId([...openedTabsId, newTab.id]);
                 }}
                 icon={<Add12Regular />}
         ></Button>
@@ -81,4 +84,4 @@ function TabView(props) {
   );
 }
 
-export { TabView };
+export { TabListView };

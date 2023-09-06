@@ -1,5 +1,5 @@
-import { generateUniqueRandomInt, generateRandomUniqueIntsExcept } from "./utils";
-import { replacePage, PAGE_REPLACEMENT_ALGORITHMS } from "./core";
+import { generateRandomUniqueIntsExcept } from "./utils";
+import { replacePage } from "./core";
 
 // 页表项
 class PageTableEntry {
@@ -78,8 +78,7 @@ class Process {
       // 发生缺页，进行页面置换
       console.log("工作集已满，发生缺页，进行页面置换，workingSet=", this.workingSet);
       this.pageFault++;
-      const replacedPageTableEntry = replacePage(pageTableEntry, this.pageTable, this.workingSet, this.pageReplacementAlgorithm);
-      return replacedPageTableEntry;
+      return replacePage(pageTableEntry, this.pageTable, this.workingSet, this.pageReplacementAlgorithm);
     }
   }
 }

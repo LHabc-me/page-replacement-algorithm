@@ -1,16 +1,16 @@
-import { Link, Route, Routes } from "react-router-dom";
-import { Button, Select } from "@fluentui/react-components";
-import { TabView } from "./components/TabView";
-import * as React from "react";
-import { SinglePage } from "./SinglePage";
 import { AutoMenu } from "./compoments/AutoMenu";
+import { Route, Routes } from "react-router-dom";
+import { Button } from "@fluentui/react-components";
+import { TabListView } from "./components/TabListView";
+import { ControlMenu } from "./components/ControlMenu";
+import { useState } from "react";
 
 function Router() {
-  const Tab = <TabView windows={[]}
-                       newTabTitle={"new"}
-                       newWindow={() => {
-                         return { title: "new", component: <Home /> };
-                       }} />;
+  const Tab = <TabListView windows={[]}
+                           newTabTitle={"new"}
+                           newWindow={() => {
+                             return { title: "new", component: <About /> };
+                           }} />;
   return (
     <Routes>
       <Route path="*" element={<Home />} />
@@ -31,16 +31,21 @@ const Home = (props) => {
 };
 
 const About = (props) => {
+  const [logicalPageCount, setLogicalPageCount] = useState(6);
+  const [pageSize, setPageSize] = useState(4096);
+  const [workingSetCount, setWorkingSetCount] = useState(6);
+  const [algorithm, setAlgorithm] = useState("FIFO");
+
   return (
-    <>
-      <Select>
-        <option>Red</option>
-        <option>Green</option>
-        <option>Blue</option>
-      </Select>
-      <Button>
-        <Link to={"/"}>Return</Link>
-      </Button></>
+    <ControlMenu logicalPageCount={logicalPageCount}
+                 pageSize={pageSize}
+                 workingSetCount={workingSetCount}
+                 algorithm={algorithm}
+                 setLogicalPageCount={setLogicalPageCount}
+                 setPageSize={setPageSize}
+                 setWorkingSetCount={setWorkingSetCount}
+                 setAlgorithm={setAlgorithm}
+                 trigger={<Button className={"float-right"}>设置</Button>} />
   );
 };
 
