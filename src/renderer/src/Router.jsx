@@ -1,16 +1,25 @@
 import { AutoMenu } from "./compoments/AutoMenu";
 import { Route, Routes } from "react-router-dom";
-import { Button } from "@fluentui/react-components";
+import { Button, Divider } from "@fluentui/react-components";
 import { TabListView } from "./components/TabListView";
 import { ControlMenu } from "./components/ControlMenu";
 import { useState } from "react";
+import { Settings16Filled } from "@fluentui/react-icons";
 
 function Router() {
-  const Tab = <TabListView windows={[]}
-                           newTabTitle={"new"}
-                           newWindow={() => {
-                             return { title: "new", component: <About /> };
-                           }} />;
+  const Tab =
+    <div>
+      <TabListView windows={[]}
+                   newTabTitle={"new"}
+                   newWindow={() => {
+                     return { title: "new", component: <About /> };
+                   }}
+                   before={
+                     <Button icon={<Settings16Filled />} appearance={"subtle"}>
+                     </Button>
+                   } />
+
+    </div>;
   return (
     <Routes>
       <Route path="*" element={<Home />} />
@@ -45,7 +54,7 @@ const About = (props) => {
                  onPageSizeChange={(_, data) => setPageSize(data.value)}
                  onWorkingSetCountChange={(_, data) => setWorkingSetCount(data.value)}
                  onAlgorithmChange={(_, data) => setAlgorithm(data.value)}
-                 trigger={<Button className={"float-right"}>设置</Button>} />
+                 trigger={<Button className={"float-left"}>设置</Button>} />
   );
 };
 

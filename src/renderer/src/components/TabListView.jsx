@@ -2,9 +2,10 @@ import React, { useState } from "react";
 import { Button, TabList, Tab } from "@fluentui/react-components";
 import { Add12Regular, Dismiss12Regular } from "@fluentui/react-icons";
 import { AnimatePresence, motion } from "framer-motion";
+import KeepAlive from "react-activation";
 
 function TabListView(props) {
-  const { windows, newWindow } = props;
+  const { windows, newWindow, before, after } = props;
   const [id, setId] = useState(0);
   const [tabs, setTabs] = useState(windows.map((window) => {
     const o = { ...window, id };
@@ -12,13 +13,13 @@ function TabListView(props) {
     return o;
   }));
   const [selectedTabId, setSelectedTabId] = useState(-1);
-  const ActiveTabComponent = tabs.find((tab) => tab.id === selectedTabId)?.component ?? <div>Not Found</div>;
   const [openedTabsId, setOpenedTabsId] = useState([]);
   return (
     <div>
       <div className={"flex flex-row"}>
         <TabList defaultSelectedValue={0}
                  selectedValue={selectedTabId}>
+          {before}
           {tabs.map(tab => {
             return (
               <Tab key={tab.id}
@@ -30,8 +31,7 @@ function TabListView(props) {
                        setOpenedTabsId([...openedTabsId, tab.id]);
                      }
                    }}
-                   className={"h-8 w-40"}
-              >
+                   className={"h-8 w-40"}>
                 <div className={"flex justify-between"}>
                   <span className={"w-80"}>{tab.title}</span>
                   {tab.id === selectedTabId ? <motion.div className={"underline"} layoutId={"underline"} /> : null}
@@ -46,8 +46,9 @@ function TabListView(props) {
                             setSelectedTabId(opened[opened.length - 1] ?? -1);
                           }}
                           icon={<Dismiss12Regular />}
-                          tabIndex={-1}
-                  ></Button>
+                          tabIndex={-1}>
+
+                  </Button>
                 </div>
               </Tab>
             );
@@ -63,8 +64,9 @@ function TabListView(props) {
                   setSelectedTabId(newTab.id);
                   setOpenedTabsId([...openedTabsId, newTab.id]);
                 }}
-                icon={<Add12Regular />}
-        ></Button>
+                icon={<Add12Regular />}>
+        </Button>
+        {after}
       </div>
       <AnimatePresence mode={"wait"}>
         {selectedTabId !== -1 && (
@@ -73,10 +75,11 @@ function TabListView(props) {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.4 }}
-            key={selectedTabId}
-          >
-            {/* 放置活跃标签页的component */}
-            {ActiveTabComponent}
+            key={selectedTabId}>
+            <KeepAlive>
+              {/* 放置活跃标签页的component */}
+              {tabs.find((tab) => tab.id === selectedTabId)?.component ?? <div>Not Found</div>}
+            </KeepAlive>
           </motion.div>
         )}
       </AnimatePresence>

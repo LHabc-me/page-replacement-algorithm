@@ -1,14 +1,17 @@
 import React from "react";
 import "./assets/index.css";
-import ReactDOM from "react-dom";
+import ReactDOMClient from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 import { Router } from "./Router";
 import { ThemeProvider } from "./components/ThemeContext";
+import { AliveScope } from "react-activation";
 
-ReactDOM.createRoot(document.getElementById("root")).render(
-  <ThemeProvider>
-    <BrowserRouter>
-      <Router />
-    </BrowserRouter>
-  </ThemeProvider>
+ReactDOMClient.createRoot(document.getElementById("root")).render(
+  <AliveScope>
+    <ThemeProvider>
+      <BrowserRouter>
+        <Router />
+      </BrowserRouter>
+    </ThemeProvider>
+  </AliveScope>
 );
