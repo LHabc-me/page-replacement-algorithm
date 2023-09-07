@@ -76,11 +76,11 @@ function ControlMenu(props) {
   const [enableSettings, setEnableSettings] = useState(true);
   const { trigger } = props;
   return (
-    <div>
+    <div style={props.style} className={props.className}>
       {/*按钮提示*/}
       <div ref={setTip}></div>
 
-      <Popover inline positioning={"before"} openOnHover unstable_disableAutoFocus {...props} >
+      <Popover inline positioning={"before"} openOnHover unstable_disableAutoFocus>
         <PopoverTrigger disableButtonEnhancement>
           {trigger}
         </PopoverTrigger>

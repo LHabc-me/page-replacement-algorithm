@@ -1,29 +1,26 @@
-import { AutoMenu } from "./compoments/AutoMenu";
 import { Route, Routes } from "react-router-dom";
-import { Button, Divider } from "@fluentui/react-components";
+import { Button, Avatar } from "@fluentui/react-components";
 import { TabListView } from "./components/TabListView";
 import { ControlMenu } from "./components/ControlMenu";
+import { ApplicationMenu } from "./components/ApplicationMenu";
 import { useState } from "react";
-import { Settings16Filled } from "@fluentui/react-icons";
 
 function Router() {
-  const Tab =
+  const tab =
     <div>
       <TabListView windows={[]}
                    newTabTitle={"new"}
                    newWindow={() => {
                      return { title: "new", component: <About /> };
                    }}
-                   before={
-                     <Button icon={<Settings16Filled />} appearance={"subtle"}>
-                     </Button>
-                   } />
+                   before={<ApplicationMenu />}
+                   className={"h-screen"} />
 
     </div>;
   return (
     <Routes>
       <Route path="*" element={<Home />} />
-      <Route path="/" element={Tab} />
+      <Route path="/" element={tab} />
       <Route path="/about" element={<About />} />
     </Routes>
   );
@@ -46,16 +43,31 @@ const About = (props) => {
   const [algorithm, setAlgorithm] = useState("FIFO");
 
   return (
-    <ControlMenu logicalPageCount={logicalPageCount}
-                 pageSize={pageSize}
-                 workingSetCount={workingSetCount}
-                 algorithm={algorithm}
-                 onLogicalPageCountChange={(_, data) => setLogicalPageCount(data.value)}
-                 onPageSizeChange={(_, data) => setPageSize(data.value)}
-                 onWorkingSetCountChange={(_, data) => setWorkingSetCount(data.value)}
-                 onAlgorithmChange={(_, data) => setAlgorithm(data.value)}
-                 trigger={<Button className={"float-left"}>设置</Button>} />
+    <div className={"grid h-full bg-red-300"}>
+      <ControlMenu logicalPageCount={logicalPageCount}
+                   pageSize={pageSize}
+                   workingSetCount={workingSetCount}
+                   algorithm={algorithm}
+                   onLogicalPageCountChange={(_, data) => setLogicalPageCount(data.value)}
+                   onPageSizeChange={(_, data) => setPageSize(data.value)}
+                   onWorkingSetCountChange={(_, data) => setWorkingSetCount(data.value)}
+                   onAlgorithmChange={(_, data) => setAlgorithm(data.value)}
+                   trigger={<Button>设置</Button>}
+                   className={"place-self-center"} />
+    </div>
   );
 };
+
+function Test() {
+  const [list, setList] = useState([]);
+  return (
+    <div className={"flex flex-row"}>
+      <Button onClick={() => setList([...list, list.length])}>+1</Button>
+      {
+        list.map((value, index) => <Avatar key={index} name={value.toString()} />)
+      }
+    </div>
+  );
+}
 
 export { Router };

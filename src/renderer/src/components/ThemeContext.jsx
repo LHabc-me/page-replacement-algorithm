@@ -5,10 +5,10 @@
  */
 
 
-import React, { createContext, useState, useEffect } from "react";
+import React, { createContext, useState } from "react";
 import { FluentProvider, webLightTheme, webDarkTheme } from "@fluentui/react-components";
 
-const ThemeContext = createContext();
+const ThemeContext = createContext(null);
 
 const ThemeProvider = ({ children }) => {
   const [theme, setTheme] = useState(webLightTheme);
@@ -37,7 +37,7 @@ const ThemeProvider = ({ children }) => {
 
   return (
     <ThemeContext.Provider value={{ theme, toggleTheme }}>
-      <FluentProvider theme={theme} className={"h-screen"}>
+      <FluentProvider theme={theme}>
         {children}
       </FluentProvider>
     </ThemeContext.Provider>
