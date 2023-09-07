@@ -7,22 +7,41 @@ import KeepAlive from "react-activation";
 function TabListView(props) {
   const { windows, newWindow, before, after } = props;
   const [id, setId] = useState(0);
-  const [tabs, setTabs] = useState(windows.map((window) => {
+  const [tabs, setTabs] = useState(windows.map(window => {
     const o = { ...window, id };
     setId(id + 1);
     return o;
   }));
-  const [selectedTabId, setSelectedTabId] = useState(-1);
-  const [openedTabsId, setOpenedTabsId] = useState([]); // 所有可用标签页
+  const [selectedTabsId, setSelectedTabsId] = useState([-1]);
   const [hiddenTabsId, setHiddenTabsId] = useState([]); // 标签页过多时隐藏的标签页
+
+  const openedTabsId = useRef([]); // 打开的标签页的id
+
+  function selectTab(tab) {
+    if (tab.id !== -1) {
+      if (openedTabsId.current.includes(tab.id)) {
+        openedTabsId.current.splice(openedTabsId.current.indexOf(tab.id), 1);
+      }
+      openedTabsId.current.push(tab.id);
+    }
+    if (selectedTabsId[0] !== tab.id) {
+      setSelectedTabsId([tab.id]);
+    }
+  }
+
+  function closedTab(tab) {
+    openedTabsId.current.splice(openedTabsId.current.indexOf(tab.id), 1);
+    setSelectedTabsId([openedTabsId.current.at(-1) ?? -1]);
+    setTabs(tabs.filter(t => t.id !== tab.id));
+  }
 
   const tabList = useRef(null);// 标签页列表元素
   const tabListRoot = useRef(null);// 标签页列表的根元素
   const tabWidth = 160;
 
   // 监听tabList的clientWidth变化，当宽度超出时隐藏标签页
-  const openedTabsIdRef = useRef(openedTabsId);
-  openedTabsIdRef.current = openedTabsId;
+  const tabsRef = useRef(tabs);
+  tabsRef.current = tabs;
 
   const moreBtn = useRef(null);
   const newBtn = useRef(null);
@@ -30,7 +49,7 @@ function TabListView(props) {
   const afterElement = useRef(null);
 
   function handleResize() {
-    const width = tabWidth * openedTabsIdRef.current.length;
+    const width = tabWidth * tabsRef.current.length;
     const maxWidth = tabListRoot.current.clientWidth - 32/*moreBtn*/
       - beforeElement.current.clientWidth - afterElement.current.clientWidth - newBtn.current.clientWidth;
 
@@ -40,8 +59,7 @@ function TabListView(props) {
       setHiddenTabsId([]);
     } else {// 隐藏标签页-count个
       //取最后-count个标签页
-      const last = openedTabsIdRef.current.slice(count);
-      // console.log(last);
+      const last = tabsRef.current.slice(count).map(tab => tab.id);
       setHiddenTabsId([...last]);
     }
   }
@@ -55,7 +73,7 @@ function TabListView(props) {
   }, []);
   useEffect(() => {
     handleResize();
-  }, [openedTabsId]);
+  }, [tabs]);
 
   const tabListView = tabs.map(tab => {
     return {
@@ -64,11 +82,7 @@ function TabListView(props) {
         <Tab key={tab.id}
              value={tab.id}
              icon={tabs.icon}
-             onClick={() => {
-               if (selectedTabId !== tab.id) {
-                 setSelectedTabId(tab.id);
-               }
-             }}
+             onClick={() => selectTab(tab)}
              className={"h-8"}
              style={{ width: tabWidth }}>
           <div className={"flex justify-between"}>
@@ -76,13 +90,9 @@ function TabListView(props) {
             {/* 删除标签页 */}
             <Button appearance={"subtle"}
                     size={"small"}
-                    onClick={() => {
-                      setTabs(tabs.filter((t) => t.id !== tab.id));
-                      const opened = openedTabsId.filter((t) => t !== tab.id);
-                      setOpenedTabsId(opened.filter((t) => t !== tab.id));
-                      if (selectedTabId === tab.id) {
-                        setSelectedTabId(opened[opened.length - 1] ?? -1);
-                      }
+                    onClick={e => {
+                      e.stopPropagation();// 防止触发Tab的onClick事件
+                      closedTab(tab);
                     }}
                     icon={<Dismiss12Regular />}>
             </Button>
@@ -97,10 +107,10 @@ function TabListView(props) {
         <div ref={beforeElement}>
           {before}
         </div>
-        <TabList defaultSelectedValue={0}
-                 selectedValue={selectedTabId}
+        <TabList defaultSelectedValue={-1}
+                 selectedValue={selectedTabsId[0]}
                  ref={tabList}>
-          {tabListView.filter((tab) => !hiddenTabsId.includes(tab.id)).map((tab) => tab.component)}
+          {tabListView.filter(tab => !hiddenTabsId.includes(tab.id)).map(tab => tab.component)}
         </TabList>
 
         {/*标签页过多时在此隐藏*/}
@@ -114,8 +124,10 @@ function TabListView(props) {
               </Button>
             </PopoverTrigger>
             <PopoverSurface style={{ padding: 0 }}>
-              <TabList selectedValue={selectedTabId} vertical>
-                {tabListView.filter((tab) => hiddenTabsId.includes(tab.id)).map((tab) => tab.component)}
+              <TabList vertical
+                       defaultValue={-1}
+                       selectedValue={selectedTabsId[0]}>
+                {tabListView.filter(tab => hiddenTabsId.includes(tab.id)).map(tab => tab.component)}
               </TabList>
             </PopoverSurface>
           </Popover>
@@ -131,8 +143,7 @@ function TabListView(props) {
                     setHiddenTabsId([...hiddenTabsId, newTab.id]);
                   }
                   setTabs([...tabs, newTab]);
-                  setSelectedTabId(newTab.id);
-                  setOpenedTabsId([...openedTabsId, newTab.id]);
+                  selectTab(newTab);
                 }}
                 icon={<Add12Regular />}
                 ref={newBtn}>
@@ -142,21 +153,26 @@ function TabListView(props) {
         </div>
       </div>
       <AnimatePresence mode={"wait"}>
-        {selectedTabId !== -1 && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.4 }}
-            key={selectedTabId}>
-            <KeepAlive>
-              <TabList>
-                {/* 放置活跃标签页的component */}
-                {tabs.find((tab) => tab.id === selectedTabId)?.component ?? <div>Not Found</div>}
-              </TabList>
-            </KeepAlive>
-          </motion.div>
-        )}
+        {
+          selectedTabsId[0] !== -1 && (
+            tabs
+              .filter(tab => tab.id === selectedTabsId[0])
+              .map(tab => (
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.4 }}
+                    key={tab.id}>
+                    <KeepAlive name={`TabListView_Component_${tab.id}`} key={tab.id}>
+                      {tab.component}
+                      <div>{tab.id}</div>
+                    </KeepAlive>
+                  </motion.div>
+                )
+              )
+          )
+        }
       </AnimatePresence>
     </div>
   );

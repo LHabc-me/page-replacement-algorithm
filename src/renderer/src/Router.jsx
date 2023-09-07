@@ -60,11 +60,16 @@ const About = (props) => {
 
 function Test() {
   const [list, setList] = useState([]);
+  const [selected, setSelected] = useState(-1);
   return (
     <div className={"flex flex-row"}>
       <Button onClick={() => setList([...list, list.length])}>+1</Button>
       {
-        list.map((value, index) => <Avatar key={index} name={value.toString()} />)
+        list.map((value, index) => (
+          <Avatar key={index} icon={value.toString()}
+                  onClick={() => setSelected(index)}
+                  active={selected === index ? "active" : ""} />
+        ))
       }
     </div>
   );
