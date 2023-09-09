@@ -1,43 +1,47 @@
 /**
  @usage
- const { currentTheme, toggleTheme } = useContext(ThemeContext);
+ const { theme, toggleTheme } = useContext(ThemeContext);
  toggleTheme("system"); // system, light, dark
  */
 
 
-import React, { createContext, useState } from "react";
+import React, { createContext, useEffect, useState } from "react";
 import { FluentProvider, webLightTheme, webDarkTheme } from "@fluentui/react-components";
 
 const ThemeContext = createContext(null);
 
 const ThemeProvider = ({ children }) => {
-  const [theme, setTheme] = useState(webLightTheme);
+  const [theme, setTheme] = useState({ name: "light", value: webLightTheme });
 
   const toggleTheme = (theme) => {
     switch (theme.toLowerCase()) {
       case "light":
-        setTheme(webLightTheme);
+        setTheme({ name: "light", value: webLightTheme });
         break;
       case "dark":
-        setTheme(webDarkTheme);
+        setTheme({ name: "dark", value: webDarkTheme });
         break;
       case "system":
         const prefersDarkMode = window.matchMedia &&
           window.matchMedia("(prefers-color-scheme: dark)").matches;
-        setTheme(prefersDarkMode ? webDarkTheme : webLightTheme);
+        prefersDarkMode ? setTheme({ name: "system", value: webDarkTheme }) : setTheme({ name: "system", value: webLightTheme });
         break;
     }
+    localStorage.setItem("theme", theme);
   };
 
-  // useEffect(() => {
-  //   const prefersDarkMode = window.matchMedia &&
-  //     window.matchMedia("(prefers-color-scheme: dark)").matches;
-  //   setCurrentTheme(prefersDarkMode ? webDarkTheme : webLightTheme);
-  // }, []);
+  useEffect(() => {
+    const prefers = localStorage.getItem("theme");
+    if (prefers) {
+      toggleTheme(prefers);
+    } else {
+      toggleTheme("system");
+    }
+  }, []);
 
   return (
     <ThemeContext.Provider value={{ theme, toggleTheme }}>
-      <FluentProvider theme={theme}>
+      <FluentProvider theme={theme.value}>
         {children}
       </FluentProvider>
     </ThemeContext.Provider>

@@ -20,7 +20,7 @@ function Router() {
   return (
     <Routes>
       <Route path="*" element={<Home />} />
-      <Route path="/" element={tab} />
+      <Route path="/" exact element={tab} />
       <Route path="/about" element={<About />} />
     </Routes>
   );
