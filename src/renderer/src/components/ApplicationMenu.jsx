@@ -58,8 +58,41 @@ function ThemeSelecter(props) {
   );
 }
 
-function ApplicationMenu(props) {
+function AboutThisApp(props) {
+  return (
+    <div {...props}>
+      <div className={"flex flex-row justify-between"}>
+        <span>项目地址</span>
+        <Link
+          as={"a"}
+          target={"_blank"}
+          href={"https://github.com/LHabc-me/page-replacement-algorithm"}>
+          page-replacement-algorithm
+        </Link>
+      </div>
+      <div className={"flex flex-row justify-between"}>
+        <span>使用教程</span>
+        <Link
+          as={"a"}
+          target={"_blank"}
+          href={""}>
+          点击查看示例
+        </Link>
+      </div>
+      <div className={"flex flex-row justify-between"}>
+        <span>关于页面置换算法</span>
+        <Link
+          as={"a"}
+          target={"_blank"}
+          href={"https://zh.wikipedia.org/zh-cn/%E5%BF%AB%E5%8F%96%E6%96%87%E4%BB%B6%E7%BD%AE%E6%8F%9B%E6%A9%9F%E5%88%B6"}>
+          算法介绍
+        </Link>
+      </div>
+    </div>
+  );
+}
 
+function ApplicationMenu(props) {
   return (
     <div {...props}>
       <Popover positioning={"below"}>
@@ -76,33 +109,7 @@ function ApplicationMenu(props) {
             </div>
             <div className={"space-y-2"}>
               <Divider alignContent={"start"}>关于软件</Divider>
-              <div className={"flex flex-row justify-between"}>
-                <span>项目地址</span>
-                <Link
-                  as={"a"}
-                  target={"_blank"}
-                  href={"https://github.com/LHabc-me/page-replacement-algorithm"}>
-                  page-replacement-algorithm
-                </Link>
-              </div>
-              <div className={"flex flex-row justify-between"}>
-                <span>使用教程</span>
-                <Link
-                  as={"a"}
-                  target={"_blank"}
-                  href={""}>
-                  点击查看示例
-                </Link>
-              </div>
-              <div className={"flex flex-row justify-between"}>
-                <span>关于页面置换算法</span>
-                <Link
-                  as={"a"}
-                  target={"_blank"}
-                  href={"https://zh.wikipedia.org/zh-cn/%E5%BF%AB%E5%8F%96%E6%96%87%E4%BB%B6%E7%BD%AE%E6%8F%9B%E6%A9%9F%E5%88%B6"}>
-                  算法介绍
-                </Link>
-              </div>
+              <AboutThisApp className={"space-y-2"} />
             </div>
           </div>
         </PopoverSurface>

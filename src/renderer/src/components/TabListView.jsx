@@ -1,38 +1,45 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Button, TabList, Tab, PopoverTrigger, PopoverSurface, Popover } from "@fluentui/react-components";
 import { Add12Regular, Dismiss12Regular, MoreHorizontalRegular } from "@fluentui/react-icons";
 import { AnimatePresence, motion } from "framer-motion";
 import KeepAlive from "react-activation";
 
+
+/*
+windows: {
+  id: number,           // 标签页id，唯一
+  title: string,        // 标签页标题
+  icon: ReactNode       // 标签页图标
+  component: ReactNode  // 标签页内容
+  closeable: boolean    // 设置为false时可以防止关闭标签页
+}
+onAdd: function(selectTab: function(id: tab.id)) // selectTab为选择新标签页的回调函数
+onClose: function(id: tab.id)
+defaultSelectedValue: number // 默认选中的标签页id
+ */
 function TabListView(props) {
-  const { windows, newWindow, before, after } = props;
-  const [id, setId] = useState(0);
-  const [tabs, setTabs] = useState(windows.map(window => {
-    const o = { ...window, id };
-    setId(id + 1);
-    return o;
-  }));
-  const [selectedTabsId, setSelectedTabsId] = useState([-1]);
+  const { windows, onAdd, onClose, defaultSelectedValue, before, after } = props;
+  const [selectedTabsId, setSelectedTabsId] = useState([defaultSelectedValue ?? -1]);
   const [hiddenTabsId, setHiddenTabsId] = useState([]); // 标签页过多时隐藏的标签页
 
   const openedTabsId = useRef([]); // 打开的标签页的id
 
-  function selectTab(tab) {
-    if (tab.id !== -1) {
-      if (openedTabsId.current.includes(tab.id)) {
-        openedTabsId.current.splice(openedTabsId.current.indexOf(tab.id), 1);
+  function selectTab(id) {
+    if (id !== -1) {
+      if (openedTabsId.current.includes(id)) {
+        openedTabsId.current.splice(openedTabsId.current.indexOf(id), 1);
       }
-      openedTabsId.current.push(tab.id);
+      openedTabsId.current.push(id);
     }
-    if (selectedTabsId[0] !== tab.id) {
-      setSelectedTabsId([tab.id]);
+    if (selectedTabsId[0] !== id) {
+      setSelectedTabsId([id]);
     }
   }
 
   function closedTab(tab) {
     openedTabsId.current.splice(openedTabsId.current.indexOf(tab.id), 1);
     setSelectedTabsId([openedTabsId.current.at(-1) ?? -1]);
-    setTabs(tabs.filter(t => t.id !== tab.id));
+    onClose(tab.id);
   }
 
   const tabList = useRef(null);// 标签页列表元素
@@ -40,8 +47,10 @@ function TabListView(props) {
   const tabWidth = 160;
 
   // 监听tabList的clientWidth变化，当宽度超出时隐藏标签页
-  const tabsRef = useRef(tabs);
-  tabsRef.current = tabs;
+  // const tabsRef = useRef(tabs);
+  const tabsRef = useRef(windows);
+  // tabsRef.current = tabs;
+  tabsRef.current = windows;
 
   const moreBtn = useRef(null);
   const newBtn = useRef(null);
@@ -71,31 +80,35 @@ function TabListView(props) {
       window.removeEventListener("resize", handleResize);
     };
   }, []);
-  useEffect(() => {
-    handleResize();
-  }, [tabs]);
 
-  const tabListView = tabs.map(tab => {
+  useLayoutEffect(() => {
+    handleResize();
+  }, [windows]);
+
+  const tabListView = windows.map(tab => {
     return {
       id: tab.id,
       component: (
         <Tab key={tab.id}
              value={tab.id}
-             icon={tabs.icon}
-             onClick={() => selectTab(tab)}
+             icon={tab.icon}
+             onClick={() => selectTab(tab.id)}
              className={"h-8"}
              style={{ width: tabWidth }}>
           <div className={"flex justify-between"}>
             <span className={"w-80"}>{tab.title}</span>
-            {/* 删除标签页 */}
-            <Button appearance={"subtle"}
-                    size={"small"}
-                    onClick={e => {
-                      e.stopPropagation();// 防止触发Tab的onClick事件
-                      closedTab(tab);
-                    }}
-                    icon={<Dismiss12Regular />}>
-            </Button>
+            {/* 关闭标签页 */}
+            {
+              tab.closeable !== false &&
+              <Button appearance={"subtle"}
+                      size={"small"}
+                      onClick={e => {
+                        e.stopPropagation();// 防止触发Tab的onClick事件
+                        closedTab(tab);
+                      }}
+                      icon={<Dismiss12Regular />}>
+              </Button>
+            }
           </div>
         </Tab>
       )
@@ -135,16 +148,7 @@ function TabListView(props) {
 
         {/* 新建标签，并选择新标签 */}
         <Button appearance={"subtle"}
-                onClick={() => {
-                  const win = newWindow();
-                  const newTab = { id, title: win.title, component: win.component };
-                  setId(id + 1);
-                  if (tabList.current.clientWidth + tabWidth > tabListRoot.current.clientWidth) {
-                    setHiddenTabsId([...hiddenTabsId, newTab.id]);
-                  }
-                  setTabs([...tabs, newTab]);
-                  selectTab(newTab);
-                }}
+                onClick={() => onAdd(selectTab)}
                 icon={<Add12Regular />}
                 ref={newBtn}>
         </Button>
@@ -155,7 +159,7 @@ function TabListView(props) {
       <AnimatePresence mode={"wait"}>
         {
           selectedTabsId[0] !== -1 && (
-            tabs
+            windows
               .filter(tab => tab.id === selectedTabsId[0])
               .map(tab => (
                   <motion.div
@@ -166,7 +170,6 @@ function TabListView(props) {
                     key={tab.id}>
                     <KeepAlive name={`TabListView_Component_${tab.id}`} key={tab.id}>
                       {tab.component}
-                      <div>{tab.id}</div>
                     </KeepAlive>
                   </motion.div>
                 )
