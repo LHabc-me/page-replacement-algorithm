@@ -72,7 +72,7 @@ function TabList() {
     <div>
       <TabListView windows={windows}
                    newTabTitle={"new"}
-                   defaultSelectedValue={0}
+                   defaultSelectedId={0}
                    onAdd={(selectTab) => {
                      id.current++;
                      setWindows([...windows,

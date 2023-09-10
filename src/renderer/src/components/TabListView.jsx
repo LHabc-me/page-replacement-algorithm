@@ -14,32 +14,36 @@ windows: {
   closeable: boolean    // 设置为false时可以防止关闭标签页
 }
 onAdd: function(selectTab: function(id: tab.id)) // selectTab为选择新标签页的回调函数
-onClose: function(id: tab.id)
+onClose: function(id: tab.id) // 关闭标签页的回调函数，需要在此函数中删除标签页。会自动选择新标签页。
 defaultSelectedValue: number // 默认选中的标签页id
+onSelectedIdChange: function(arr: ids) // 选中的标签页id变化时的回调函数
+before: ReactNode // 标签页列表前的元素
+after: ReactNode // 标签页列表后的元素
  */
 function TabListView(props) {
-  const { windows, onAdd, onClose, defaultSelectedValue, before, after } = props;
-  const [selectedTabsId, setSelectedTabsId] = useState([defaultSelectedValue ?? -1]);
+  let { windows, onAdd, onClose, defaultSelectedId, before, after, onSelectedIdChange } = props;
+  const [selectedTabsId, setSelectedTabsId] = useState([defaultSelectedId]);
   const [hiddenTabsId, setHiddenTabsId] = useState([]); // 标签页过多时隐藏的标签页
 
   const openedTabsId = useRef([]); // 打开的标签页的id
 
   function selectTab(id) {
-    if (id !== -1) {
+    if (typeof id === "number") {
       if (openedTabsId.current.includes(id)) {
         openedTabsId.current.splice(openedTabsId.current.indexOf(id), 1);
       }
       openedTabsId.current.push(id);
     }
-    if (selectedTabsId[0] !== id) {
-      setSelectedTabsId([id]);
-    }
+    setSelectedTabsId([id]);
   }
 
-  function closedTab(tab) {
-    openedTabsId.current.splice(openedTabsId.current.indexOf(tab.id), 1);
-    setSelectedTabsId([openedTabsId.current.at(-1) ?? -1]);
-    onClose(tab.id);
+  function closedTab(id) {
+    // 自动选择新标签页
+    if (openedTabsId.current.includes(id)) {
+      openedTabsId.current.splice(openedTabsId.current.indexOf(id), 1);
+    }
+    setSelectedTabsId([openedTabsId.current.at(-1)]);
+    onClose(id);
   }
 
   const tabList = useRef(null);// 标签页列表元素
@@ -47,9 +51,7 @@ function TabListView(props) {
   const tabWidth = 160;
 
   // 监听tabList的clientWidth变化，当宽度超出时隐藏标签页
-  // const tabsRef = useRef(tabs);
   const tabsRef = useRef(windows);
-  // tabsRef.current = tabs;
   tabsRef.current = windows;
 
   const moreBtn = useRef(null);
@@ -75,6 +77,9 @@ function TabListView(props) {
 
   useEffect(() => {
     handleResize();
+    if (typeof selectedTabsId[0] === "number") {
+      selectTab(selectedTabsId[0]);
+    }
     window.addEventListener("resize", handleResize);
     return () => {
       window.removeEventListener("resize", handleResize);
@@ -84,6 +89,16 @@ function TabListView(props) {
   useLayoutEffect(() => {
     handleResize();
   }, [windows]);
+
+  useEffect(() => {
+    openedTabsId.current = openedTabsId.current.filter(id => windows.map(tab => tab.id).includes(id));
+  }, [windows]);
+
+  useEffect(() => {
+    if (onSelectedIdChange) {
+      onSelectedIdChange(selectedTabsId);
+    }
+  }, [selectedTabsId]);
 
   const tabListView = windows.map(tab => {
     return {
@@ -104,7 +119,7 @@ function TabListView(props) {
                       size={"small"}
                       onClick={e => {
                         e.stopPropagation();// 防止触发Tab的onClick事件
-                        closedTab(tab);
+                        closedTab(tab.id);
                       }}
                       icon={<Dismiss12Regular />}>
               </Button>
@@ -121,7 +136,7 @@ function TabListView(props) {
           {before}
         </div>
         <TabList defaultSelectedValue={-1}
-                 selectedValue={selectedTabsId[0]}
+                 selectedValue={selectedTabsId.filter(id => typeof id === "number").length === 1 ? selectedTabsId[0] : null}
                  ref={tabList}>
           {tabListView.filter(tab => !hiddenTabsId.includes(tab.id)).map(tab => tab.component)}
         </TabList>
@@ -139,7 +154,7 @@ function TabListView(props) {
             <PopoverSurface style={{ padding: 0 }}>
               <TabList vertical
                        defaultValue={-1}
-                       selectedValue={selectedTabsId[0]}>
+                       selectedValue={selectedTabsId.filter(id => typeof id === "number").length === 1 ? selectedTabsId[0] : null}>
                 {tabListView.filter(tab => hiddenTabsId.includes(tab.id)).map(tab => tab.component)}
               </TabList>
             </PopoverSurface>
@@ -157,25 +172,29 @@ function TabListView(props) {
         </div>
       </div>
       <AnimatePresence mode={"wait"}>
-        {
-          selectedTabsId[0] !== -1 && (
-            windows
-              .filter(tab => tab.id === selectedTabsId[0])
-              .map(tab => (
-                  <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 0.4 }}
-                    key={tab.id}>
-                    <KeepAlive name={`TabListView_Component_${tab.id}`} key={tab.id}>
-                      {tab.component}
-                    </KeepAlive>
-                  </motion.div>
-                )
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.4 }}
+          key={selectedTabsId.filter(id => typeof id === "number").join(" ")}>
+          <div className={"flex flex-row"}>
+            {
+              typeof selectedTabsId[0] === "number" && (
+                windows
+                  .filter(tab => selectedTabsId.includes(tab.id))
+                  .map(tab => (
+                      <div className={"flex-1"} key={tab.id}>
+                        <KeepAlive name={`TabListView_Component_${tab.id}`}>
+                          {tab.component}
+                        </KeepAlive>
+                      </div>
+                    )
+                  )
               )
-          )
-        }
+            }
+          </div>
+        </motion.div>
       </AnimatePresence>
     </div>
   );
