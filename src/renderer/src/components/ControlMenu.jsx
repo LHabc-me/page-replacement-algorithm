@@ -9,17 +9,29 @@ function SecondaryMenu(props) {
   const [open, setOpen] = useState(false);
 
   const {
-    logicalPageCount,
-    pageSize,
-    workingSetCount,
-    algorithm,
-    onLogicalPageCountChange,
-    onPageSizeChange,
-    onWorkingSetCountChange,
-    onAlgorithmChange,
-
+    config,
+    onConfigChange,
     enableSettings
   } = props;
+  const [newConfig, setNewConfig] = useState(config);
+
+
+  function onLogicalPageCountChange(_, data) {
+    setNewConfig({ ...newConfig, logicalPageCount: data.value });
+  }
+
+  function onPageSizeChange(_, data) {
+    setNewConfig({ ...newConfig, pageSize: data.value });
+  }
+
+  function onWorkingSetCountChange(_, data) {
+    setNewConfig({ ...newConfig, workingSetCount: data.value });
+  }
+
+  function onAlgorithmChange(_, data) {
+    setNewConfig({ ...newConfig, algorithm: data.value });
+  }
+
 
   return (
     <Popover inline withArrow
@@ -29,11 +41,11 @@ function SecondaryMenu(props) {
              openOnHover
              unstable_disableAutoFocus>
       <PopoverTrigger disableButtonEnhancement>
-        <Button icon={<Settings16Filled />} appearance={"subtle"}></Button>
+        <Button icon={<Settings16Filled />} appearance={"subtle"} onClick={() => setNewConfig(config)}></Button>
       </PopoverTrigger>
       <PopoverSurface>
         <div className={"flex flex-col"}>
-          <TabList className={"w-100"} size={"small"} appearance={"subtle"} selectedValue={algorithm}
+          <TabList className={"w-100"} size={"small"} appearance={"subtle"} selectedValue={newConfig.algorithm}
                    onTabSelect={onAlgorithmChange}
                    disabled={!enableSettings}>
             <Tab value={"FIFO"}>FIFO</Tab>
@@ -42,24 +54,24 @@ function SecondaryMenu(props) {
             <Tab value={"CLOCK"}>CLOCK</Tab>
           </TabList>
 
-          <Label htmlFor={logicalPageCountLabelId}>逻辑页面总数<span className={"float-right mr-2"}>{logicalPageCount}</span></Label>
-          <Slider value={logicalPageCount} step={1} min={1} max={12} id={logicalPageCountLabelId}
+          <Label htmlFor={logicalPageCountLabelId}>逻辑页面总数<span className={"float-right mr-2"}>{newConfig.logicalPageCount}</span></Label>
+          <Slider value={newConfig.logicalPageCount} step={1} min={1} max={12} id={logicalPageCountLabelId}
                   onChange={onLogicalPageCountChange}
                   disabled={!enableSettings} />
 
-          <Label htmlFor={pageSizeLabelId}>逻辑页面大小<span className={"float-right mr-2"}>{pageSize}字节</span></Label>
-          <Slider value={pageSize} step={1024} min={1024} max={4096 * 2} id={pageSizeLabelId}
+          <Label htmlFor={pageSizeLabelId}>逻辑页面大小<span className={"float-right mr-2"}>{newConfig.pageSize}字节</span></Label>
+          <Slider value={newConfig.pageSize} step={1024} min={1024} max={4096 * 2} id={pageSizeLabelId}
                   onChange={onPageSizeChange}
                   disabled={!enableSettings} />
 
-          <Label htmlFor={workingSetCountLabelId}>工作集大小<span className={"float-right mr-2"}>{workingSetCount}</span></Label>
-          <Slider value={workingSetCount} step={1} min={1} max={12} id={workingSetCountLabelId}
+          <Label htmlFor={workingSetCountLabelId}>工作集大小<span className={"float-right mr-2"}>{newConfig.workingSetCount}</span></Label>
+          <Slider value={newConfig.workingSetCount} step={1} min={1} max={12} id={workingSetCountLabelId}
                   onChange={onWorkingSetCountChange}
                   disabled={!enableSettings} />
 
           <div className={"flex flex-row"}>
             <Button appearance={"primary"}
-                    onClick={() => setOpen(false)}
+                    onClick={() => onConfigChange(newConfig)}
                     disabled={!enableSettings}>确定</Button>
             <Button onClick={() => setOpen(false)}>取消</Button>
           </div>

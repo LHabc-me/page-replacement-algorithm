@@ -275,7 +275,17 @@ function TabListView(props) {
                       <div key={tab.id}
                            className={layouts[windowsLayout[tab.id]] ?? "col-span-2 row-span-2"}>
                         <KeepAlive name={`TabListView_Component_${tab.id}`}>
-                          {tab.component}
+                          <div style={{
+                            height: (() => {
+                              if (!windowsLayout[tab.id]) {
+                                return hoverHeight;
+                              }
+                              return windowsLayout[tab.id].includes("Top") || windowsLayout[tab.id].includes("Bottom")
+                                ? hoverHeight / 2 : hoverHeight;
+                            })()
+                          }}>
+                            {tab.component}
+                          </div>
                         </KeepAlive>
                       </div>
                     )

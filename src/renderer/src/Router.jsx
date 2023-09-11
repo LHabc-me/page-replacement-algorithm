@@ -4,6 +4,7 @@ import { TabListView } from "./components/TabListView";
 import { ControlMenu } from "./components/ControlMenu";
 import { ApplicationMenu } from "./components/ApplicationMenu";
 import { useRef, useState } from "react";
+import { Edit20Regular } from "@fluentui/react-icons";
 
 function Router() {
 
@@ -11,7 +12,6 @@ function Router() {
     <Routes>
       <Route path="*" element={<Home />} />
       <Route path="/" exact element={<TabList />} />
-      <Route path="/about" element={<Main />} />
     </Routes>
   );
 }
@@ -28,33 +28,39 @@ const Home = (props) => {
 
 const Main = (props) => {
   const { setWindows, windowId } = props;
-  const [logicalPageCount, setLogicalPageCount] = useState(6);
-  const [pageSize, setPageSize] = useState(4096);
-  const [workingSetCount, setWorkingSetCount] = useState(6);
-  const [algorithm, setAlgorithm] = useState("FIFO");
+  const [config, setConfig] = useState({
+    logicalPageCount: 6,
+    pageSize: 4096,
+    workingSetCount: 6,
+    algorithm: "FIFO"
+  });
 
-  function onAlgorithmChange(_, data) {
-    setAlgorithm(data.value);
+  function onAlgorithmChange(algorithm) {
     setWindows(windows => windows.map(win => {
       if (win.id !== windowId) {
         return win;
       }
-      return { ...win, title: data.value };
+      return { ...win, title: algorithm };
     }));
   }
 
   return (
-    <div className={"grid h-full bg-red-300"}>
-      <ControlMenu logicalPageCount={logicalPageCount}
-                   pageSize={pageSize}
-                   workingSetCount={workingSetCount}
-                   algorithm={algorithm}
-                   onLogicalPageCountChange={(_, data) => setLogicalPageCount(data.value)}
-                   onPageSizeChange={(_, data) => setPageSize(data.value)}
-                   onWorkingSetCountChange={(_, data) => setWorkingSetCount(data.value)}
-                   onAlgorithmChange={onAlgorithmChange}
-                   trigger={<Button>设置</Button>}
-                   className={"place-self-center"} />
+    <div className={"h-full bg-red-300"}>
+      <ControlMenu config={config}
+                   onConfigChange={(config) => {
+                     setConfig(config);
+                     onAlgorithmChange(config.algorithm);
+                   }}
+                   trigger=
+                     {
+                       <div className={"float-right"}>
+                         <Button icon={<Edit20Regular />}
+                                 appearance={"secondary"}
+                                 style={{ borderRadius: "100%" }}
+                                 size={"large"}>
+                         </Button>
+                       </div>
+                     } />
     </div>
   );
 };
@@ -69,7 +75,7 @@ function TabList() {
     }]);
   const id = useRef(0);
   return (
-    <div>
+    <div className={"h-full"}>
       <TabListView windows={windows}
                    newTabTitle={"new"}
                    defaultSelectedId={0}
