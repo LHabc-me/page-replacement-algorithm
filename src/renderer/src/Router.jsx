@@ -2,16 +2,22 @@ import { Route, Routes } from "react-router-dom";
 import { Button, Avatar } from "@fluentui/react-components";
 import { TabListView } from "./components/TabListView";
 import { ControlMenu } from "./components/ControlMenu";
-import { ApplicationMenu } from "./components/ApplicationMenu";
-import { useRef, useState } from "react";
-import { Edit20Regular } from "@fluentui/react-icons";
+import * as React from "react";
+import { useState } from "react";
+import { Templates } from "./page/MenuButton";
 
 function Router() {
-
+  const Tab = <TabListView windows={[]}
+                           newTabTitle={"new"}
+                           newWindow={() => {
+                             return { title: "new", component: <About /> };
+                           }} />;
+  // const ava = <
   return (
     <Routes>
       <Route path="*" element={<Home />} />
-      <Route path="/" exact element={<TabList />} />
+      <Route path="/" element={<Templates />} />
+      <Route path="/about" element={<About />} />
     </Routes>
   );
 }

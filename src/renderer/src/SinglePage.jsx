@@ -1,7 +1,7 @@
 import * as React from "react";
-import { AlgorithmSelect } from "./compoments/AlgorithmSelect";
+import { AlgorithmSelect } from "./page/AlgorithmSelect";
 import { Button, Text } from "@fluentui/react-components";
-import { ArgumentsSetting } from "./compoments/ArgumentsSetting";
+import { ArgumentsSetting } from "./page/ArgumentsSetting";
 
 export const SinglePage = () => {
 
