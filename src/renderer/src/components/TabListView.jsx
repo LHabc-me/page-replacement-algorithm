@@ -20,6 +20,8 @@ onSelectedIdChange: function(arr: ids) // 选中的标签页id变化时的回调
 before: ReactNode // 标签页列表前的元素
 after: ReactNode // 标签页列表后的元素
  */
+
+
 function TabListView(props) {
   let { windows, onAdd, onClose, defaultSelectedId, before, after, onSelectedIdChange } = props;
   const [selectedTabsId, setSelectedTabsId] = useState([defaultSelectedId]);
@@ -34,6 +36,7 @@ function TabListView(props) {
       }
       openedTabsId.current.push(id);
     }
+    setWindowsLayout([]);
     setSelectedTabsId([id]);
   }
 
@@ -69,7 +72,7 @@ function TabListView(props) {
     if (count >= 0) {// 显示所有隐藏标签页
       setHiddenTabsId([]);
     } else {// 隐藏标签页-count个
-      //取最后-count个标签页
+      // 取最后-count个标签页
       const last = tabsRef.current.slice(count).map(tab => tab.id);
       setHiddenTabsId([...last]);
     }
@@ -100,6 +103,29 @@ function TabListView(props) {
     }
   }, [selectedTabsId]);
 
+  // 分屏时的悬浮框相关
+  const [hoverHeight, setHoverHeight] = useState(0);
+  const [windowsLayout, setWindowsLayout] = useState({});
+  const [activeHoverItems, setActiveHoverItems] = useState([]);
+  const layouts = {
+    leftTop: "col-start-1 row-start-1 row-span-1 col-span-1",
+    rightTop: "col-start-2 row-start-1 row-span-1 col-span-1",
+    left: "col-start-1 row-start-1 row-span-2 col-span-1",
+    right: "col-start-2 row-start-1 row-span-2 col-span-1",
+    leftBottom: "col-start-1 row-start-2 row-span-1 col-span-1",
+    rightBottom: "col-start-2 row-start-2 row-span-1 col-span-1"
+  };
+  useEffect(() => {
+    const adjustHeight = () => {
+      setHoverHeight(tabListRoot.current.clientHeight - tabList.current.clientHeight);
+    };
+    window.addEventListener("resize", adjustHeight);
+    adjustHeight();
+    return () => {
+      window.removeEventListener("resize", adjustHeight);
+    };
+  }, [tabListRoot, tabList]);
+
   const tabListView = windows.map(tab => {
     return {
       id: tab.id,
@@ -109,7 +135,41 @@ function TabListView(props) {
              icon={tab.icon}
              onClick={() => selectTab(tab.id)}
              className={"h-8"}
-             style={{ width: tabWidth }}>
+             style={{ width: tabWidth }}
+             draggable
+             onDrag={(e) => {
+               const left = 0, top = tabList.current.clientHeight;
+               const width = tabListRoot.current.clientWidth, height = hoverHeight;
+               const x = e.clientX, y = e.clientY;
+               const positioning = getPostioning(left, top, width, height, x, y);
+               if (positioning) {
+                 setActiveHoverItems([positioning]);
+               } else {
+                 setActiveHoverItems([]);
+               }
+             }}
+             onDragEnd={(e) => {
+               setActiveHoverItems([]);
+               const left = 0, top = tabList.current.clientHeight;
+               const width = tabListRoot.current.clientWidth, height = hoverHeight;
+               const x = e.clientX, y = e.clientY;
+               const positioning = getPostioning(left, top, width, height, x, y);
+               if (positioning) {
+                 // 检测重叠
+                 const unOverLapsId = Object
+                   .entries(windowsLayout).filter(([_, layout]) => !layout.includes(positioning) && !positioning.includes(layout))
+                   .map(([id]) => Number(id));
+                 setWindowsLayout({
+                   ...Object.fromEntries(unOverLapsId.map(id => [id, windowsLayout[id]])),
+                   [tab.id]: positioning
+                 });
+                 setSelectedTabsId([...unOverLapsId.filter(id => id !== tab.id), tab.id]);
+                 console.log({
+                   ...Object.fromEntries(unOverLapsId.map(id => [id, windowsLayout[id]])),
+                   [tab.id]: positioning
+                 });
+               }
+             }}>
           <div className={"flex justify-between"}>
             <span className={"w-80"}>{tab.title}</span>
             {/* 关闭标签页 */}
@@ -171,6 +231,33 @@ function TabListView(props) {
           {after}
         </div>
       </div>
+      {
+        activeHoverItems.length !== 0 &&
+        <div className={"absolute w-full left-0 grid grid-cols-2 grid-rows-1 p-0"}
+             style={{ height: hoverHeight }}>
+          {
+
+            ["left", "right"].map((layout, index) => {
+              return (
+                <HoverItem key={index}
+                           active={activeHoverItems.includes(layout)} />
+              );
+            })
+          }
+        </div>
+      }
+      {
+        activeHoverItems.length !== 0 &&
+        <div className={"absolute w-full left-0 grid grid-cols-2 grid-rows-2 p-0"}
+             style={{ height: hoverHeight }}>
+          {
+            ["leftTop", "rightTop", "leftBottom", "rightBottom"].map((layout, index) => (
+              <HoverItem key={index}
+                         active={activeHoverItems.includes(layout)} />
+            ))
+          }
+        </div>
+      }
       <AnimatePresence mode={"wait"}>
         <motion.div
           initial={{ opacity: 0 }}
@@ -178,13 +265,15 @@ function TabListView(props) {
           exit={{ opacity: 0 }}
           transition={{ duration: 0.4 }}
           key={selectedTabsId.filter(id => typeof id === "number").join(" ")}>
-          <div className={"flex flex-row"}>
+          <div className={"grid grid-rows-2 grid-cols-2"}
+               style={{ height: hoverHeight }}>
             {
-              typeof selectedTabsId[0] === "number" && (
+              selectedTabsId.filter(tab => typeof tab === "number").length !== 0 && (
                 windows
                   .filter(tab => selectedTabsId.includes(tab.id))
                   .map(tab => (
-                      <div className={"flex-1"} key={tab.id}>
+                      <div key={tab.id}
+                           className={layouts[windowsLayout[tab.id]] ?? "col-span-2 row-span-2"}>
                         <KeepAlive name={`TabListView_Component_${tab.id}`}>
                           {tab.component}
                         </KeepAlive>
@@ -198,6 +287,66 @@ function TabListView(props) {
       </AnimatePresence>
     </div>
   );
+}
+
+
+function HoverItem(props) {
+  const { onDrop, active, onEnter, onLeave } = props;
+
+  const handleDragEnter = () => {
+    if (onEnter) {
+      onEnter();
+    }
+  };
+
+  const handleDragLeave = () => {
+    if (onLeave) {
+      onLeave();
+    }
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault(); // 阻止默认的拖放行为
+  };
+
+  const handleDrop = () => {
+    // 在这里执行拖放成功后的操作
+    if (onDrop) {
+      onDrop();
+    }
+  };
+  return (
+    <div className={active ? "bg-gray-500 opacity-50" : ""}
+         onDragEnter={handleDragEnter}
+         onDragLeave={handleDragLeave}
+         onDragOver={handleDragOver}
+         onDrop={handleDrop}>
+    </div>
+  );
+}
+
+
+function getPostioning(left, top, width, height, x, y) {
+  if (x > left && x < left + width / 3) {
+    // 左侧
+    if (y > top && y < top + height / 3) {
+      return "leftTop";
+    } else if (y > top + height * 2 / 3 && y < top + height) {
+      return "leftBottom";
+    } else if (y > top + height / 3 && y < top + height * 2 / 3) {
+      return "left";
+    }
+  }
+  if (x > left + width * 2 / 3 && x < left + width) {
+    // 右侧
+    if (y > top && y < top + height / 3) {
+      return "rightTop";
+    } else if (y > top + height * 2 / 3 && y < top + height) {
+      return "rightBottom";
+    } else if (y > top + height / 3 && y < top + height * 2 / 3) {
+      return "right";
+    }
+  }
 }
 
 export { TabListView };
