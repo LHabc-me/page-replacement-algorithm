@@ -5,7 +5,7 @@ import React, { useEffect, useState, useRef } from "react";
 function SecondaryMenu(props) {
   const logicalPageCountLabelId = useId("logicalPageCountLabel");
   const pageSizeLabelId = useId("pageSizeLabel");
-  const workingSetCountLabelId = useId("workingSetCountLabel");
+  const workingSetSizeLabelId = useId("workingSetSizeLabel");
   const [open, setOpen] = useState(false);
 
   const {
@@ -24,14 +24,13 @@ function SecondaryMenu(props) {
     setNewConfig({ ...newConfig, pageSize: data.value });
   }
 
-  function onWorkingSetCountChange(_, data) {
-    setNewConfig({ ...newConfig, workingSetCount: data.value });
+  function onWorkingSetSizeChange(_, data) {
+    setNewConfig({ ...newConfig, workingSetSize: data.value });
   }
 
   function onAlgorithmChange(_, data) {
     setNewConfig({ ...newConfig, algorithm: data.value });
   }
-
 
   return (
     <Popover inline withArrow
@@ -45,34 +44,50 @@ function SecondaryMenu(props) {
       </PopoverTrigger>
       <PopoverSurface>
         <div className={"flex flex-col"}>
-          <TabList className={"w-100"} size={"small"} appearance={"subtle"} selectedValue={newConfig.algorithm}
-                   onTabSelect={onAlgorithmChange}
-                   disabled={!enableSettings}>
-            <Tab value={"FIFO"}>FIFO</Tab>
-            <Tab value={"LRU"}>LRU</Tab>
-            <Tab value={"NUR"}>NUR</Tab>
-            <Tab value={"CLOCK"}>CLOCK</Tab>
-          </TabList>
-
-          <Label htmlFor={logicalPageCountLabelId}>逻辑页面总数<span className={"float-right mr-2"}>{newConfig.logicalPageCount}</span></Label>
-          <Slider value={newConfig.logicalPageCount} step={1} min={1} max={12} id={logicalPageCountLabelId}
-                  onChange={onLogicalPageCountChange}
-                  disabled={!enableSettings} />
-
-          <Label htmlFor={pageSizeLabelId}>逻辑页面大小<span className={"float-right mr-2"}>{newConfig.pageSize}字节</span></Label>
-          <Slider value={newConfig.pageSize} step={1024} min={1024} max={4096 * 2} id={pageSizeLabelId}
-                  onChange={onPageSizeChange}
-                  disabled={!enableSettings} />
-
-          <Label htmlFor={workingSetCountLabelId}>工作集大小<span className={"float-right mr-2"}>{newConfig.workingSetCount}</span></Label>
-          <Slider value={newConfig.workingSetCount} step={1} min={1} max={12} id={workingSetCountLabelId}
-                  onChange={onWorkingSetCountChange}
-                  disabled={!enableSettings} />
-
+          {
+            config.algorithm &&
+            <TabList className={"w-100"} size={"small"} appearance={"subtle"} selectedValue={newConfig.algorithm}
+                     onTabSelect={onAlgorithmChange}
+                     disabled={!enableSettings}>
+              <Tab value={"FIFO"}>FIFO</Tab>
+              <Tab value={"LRU"}>LRU</Tab>
+              <Tab value={"NUR"}>NUR</Tab>
+              <Tab value={"CLOCK"}>CLOCK</Tab>
+            </TabList>
+          }
+          {
+            config.logicalPageCount &&
+            <>
+              <Label htmlFor={logicalPageCountLabelId}>逻辑页面总数<span className={"float-right mr-2"}>{newConfig.logicalPageCount}</span></Label>
+              <Slider value={newConfig.logicalPageCount} step={1} min={1} max={12} id={logicalPageCountLabelId}
+                      onChange={onLogicalPageCountChange}
+                      disabled={!enableSettings} />
+            </>
+          }
+          {
+            config.pageSize &&
+            <>
+              <Label htmlFor={pageSizeLabelId}>逻辑页面大小<span className={"float-right mr-2"}>{newConfig.pageSize}字节</span></Label>
+              <Slider value={newConfig.pageSize} step={1024} min={1024} max={4096 * 2} id={pageSizeLabelId}
+                      onChange={onPageSizeChange}
+                      disabled={!enableSettings} />
+            </>
+          }
+          {
+            config.workingSetSize &&
+            <>
+              <Label htmlFor={workingSetSizeLabelId}>工作集大小<span className={"float-right mr-2"}>{newConfig.workingSetSize}</span></Label>
+              <Slider value={newConfig.workingSetSize} step={1} min={1} max={12} id={workingSetSizeLabelId}
+                      onChange={onWorkingSetSizeChange}
+                      disabled={!enableSettings} />
+            </>
+          }
           <div className={"flex flex-row"}>
             <Button appearance={"primary"}
-                    onClick={() => onConfigChange(newConfig)}
-                    disabled={!enableSettings}>确定</Button>
+                    onClick={() => {
+                      onConfigChange(newConfig);
+                    }}
+                    disabled={!enableSettings || JSON.stringify(newConfig) === JSON.stringify(config)}>确定</Button>
             <Button onClick={() => setOpen(false)}>取消</Button>
           </div>
         </div>
@@ -82,11 +97,10 @@ function SecondaryMenu(props) {
 }
 
 
-function ControlMenu(props) {
+function ControlPanel(props) {
   const [showPauseButton, setShowPauseButton] = useState(false);
   const [tip, setTip] = useState();
-  const [enableSettings, setEnableSettings] = useState(true);
-  const { trigger } = props;
+  const { trigger, onRunNext, onRunAll, onPause, onTerminate, enableSettings } = props;
   return (
     <div style={props.style} className={props.className}>
       {/*按钮提示*/}
@@ -99,14 +113,17 @@ function ControlMenu(props) {
         <PopoverSurface className={"flex flex-col"} style={{ padding: 5 }}>
           <Tooltip content={"单步执行"} relationship={"label"} mountNode={tip} withArrow positioning={"before"}>
             <Button icon={<Play16Filled color={"green"} />} appearance={"subtle"}
-                    onClick={() => setEnableSettings(false)}></Button>
+                    onClick={onRunNext}></Button>
           </Tooltip>
           {
             showPauseButton ?
               <Tooltip content={"暂停"} relationship={"label"} mountNode={tip} withArrow positioning={"before"}>
                 <Button icon={<Pause16Filled color={"green"} />}
                         appearance={"subtle"}
-                        onClick={() => setShowPauseButton(false)}>
+                        onClick={() => {
+                          setShowPauseButton(false);
+                          onPause();
+                        }}>
                 </Button>
               </Tooltip>
               :
@@ -115,14 +132,14 @@ function ControlMenu(props) {
                         appearance={"subtle"}
                         onClick={() => {
                           setShowPauseButton(true);
-                          setEnableSettings(false);
+                          onRunAll();
                         }}>
                 </Button>
               </Tooltip>
           }
           <Tooltip content={"终止"} relationship={"label"} mountNode={tip} withArrow positioning={"before"}>
             <Button icon={<Square16Filled color={"red"} />} appearance={"subtle"}
-                    onClick={() => setEnableSettings(true)}></Button>
+                    onClick={onTerminate}></Button>
           </Tooltip>
           <SecondaryMenu {...props} enableSettings={enableSettings} />
         </PopoverSurface>
@@ -131,4 +148,4 @@ function ControlMenu(props) {
   );
 }
 
-export { ControlMenu };
+export default ControlPanel;

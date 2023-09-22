@@ -92,7 +92,7 @@ function AboutThisApp(props) {
   );
 }
 
-function ApplicationMenu(props) {
+function ApplicationPanel(props) {
   return (
     <div {...props}>
       <Popover positioning={"below"}>
@@ -118,4 +118,4 @@ function ApplicationMenu(props) {
   );
 }
 
-export { ApplicationMenu };
+export default ApplicationPanel;

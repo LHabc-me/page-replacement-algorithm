@@ -8,7 +8,7 @@
 import React, { createContext, useEffect, useState } from "react";
 import { FluentProvider, webLightTheme, webDarkTheme } from "@fluentui/react-components";
 
-const ThemeContext = createContext(null);
+const ThemeContext = createContext();
 
 const ThemeProvider = ({ children }) => {
   const [theme, setTheme] = useState({ name: "light", value: webLightTheme });

@@ -44,14 +44,14 @@ class PageTable {
 
 // 进程
 class Process {
-  constructor({ logicalPageCount, pageSize, workingSetCount, pageReplacementAlgorithm }) {
+  constructor({ logicalPageCount, pageSize, workingSetSize, algorithm }) {
     this.pageTable = new PageTable({ logicalPageCount, pageSize }); // 页表
     this.workingSet = []; // 工作集
-    this.workingSetCount = workingSetCount; // 工作集大小
+    this.workingSetSize = workingSetSize; // 工作集大小
     this.pageFault = 0; // 缺页次数
     this.pageHit = 0; // 命中次数
     this.pageFaultRate = 0; // 缺页率
-    this.pageReplacementAlgorithm = pageReplacementAlgorithm; // 页面置换算法
+    this.algorithm = algorithm; // 页面置换算法
   }
 
   // 访问逻辑地址。如果发生页面置换，返回被置换的页表项
@@ -68,7 +68,7 @@ class Process {
       console.log("命中\nworkingSet=", this.workingSet);
       this.pageHit++;
       return null;
-    } else if (this.workingSet.length < this.workingSetCount) { // 未命中，工作集未满
+    } else if (this.workingSet.length < this.workingSetSize) { // 未命中，工作集未满
       console.log("工作集未满，直接装入内存\nworkingSet=", this.workingSet);
       this.workingSet.push(logicalPage);
       pageTableEntry.accessed = false; // 装入内存后，访问位置为0
@@ -78,18 +78,9 @@ class Process {
       // 发生缺页，进行页面置换
       console.log("工作集已满，发生缺页，进行页面置换，workingSet=", this.workingSet);
       this.pageFault++;
-      return replacePage(pageTableEntry, this.pageTable, this.workingSet, this.pageReplacementAlgorithm);
+      return replacePage(pageTableEntry, this.pageTable, this.workingSet, this.algorithm);
     }
   }
 }
 
-
-const p = new Process(
-  {
-    logicalPageCount: 4,
-    pageSize: 1,
-    workingSetCount: 2,
-    pageReplacementAlgorithm: "CLOCK"
-  });
-
-p.access();
+export { Process };

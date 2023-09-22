@@ -1,5 +1,4 @@
 // 页面置换算法
-const assert = require("assert");
 const PAGE_REPLACEMENT_ALGORITHMS = {
   FIFO: "FIFO",
   LRU: "LRU",
@@ -7,9 +6,9 @@ const PAGE_REPLACEMENT_ALGORITHMS = {
   CLOCK: "CLOCK"
 };
 
-function replacePage(pageTableEntry, pageTable, workingSet, pageReplacementAlgorithm) {
+function replacePage(pageTableEntry, pageTable, workingSet, algorithm) {
   let result;
-  switch (pageReplacementAlgorithm) {
+  switch (algorithm) {
     case PAGE_REPLACEMENT_ALGORITHMS.FIFO:
       result = replacePageFIFO(pageTableEntry, pageTable, workingSet);
       break;

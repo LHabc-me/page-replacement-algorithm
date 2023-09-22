@@ -134,6 +134,12 @@ function TabListView(props) {
              value={tab.id}
              icon={tab.icon}
              onClick={() => selectTab(tab.id)}
+             onMouseDown={(e) => {
+               if (tab.closeable !== false && e.button === 1) {
+                 e.stopPropagation();
+                 closedTab(tab.id);
+               }
+             }}
              className={"h-8"}
              style={{ width: tabWidth }}
              draggable
@@ -359,4 +365,4 @@ function getPostioning(left, top, width, height, x, y) {
   }
 }
 
-export { TabListView };
+export default TabListView;
