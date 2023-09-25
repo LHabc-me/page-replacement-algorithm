@@ -1,13 +1,9 @@
 import * as React from "react";
 import { useState } from "react";
-import { Avatar, Button, Card, Input, makeStyles, shorthands, Switch, Text, tokens } from "@fluentui/react-components";
-import {
-  Add12Regular,
-  FlashSettings20Filled,
-  ImageReflection20Regular,
-  RotateLeft20Regular
-} from "@fluentui/react-icons";
+import { Avatar, Button, Card, makeStyles, shorthands, Switch, Text, tokens } from "@fluentui/react-components";
+import { Add12Regular, FlashSettings20Filled } from "@fluentui/react-icons";
 import { motion } from "framer-motion";
+import CLOCK from "./CLOCK";
 
 const useStyles = makeStyles({
   container: {
@@ -52,10 +48,11 @@ const useStyles = makeStyles({
   }
 });
 
-export const Templates = () => {
+export const SinglePage = () => {
   return (
     <div className={"flex flex-col"}>
       <div><RenderCard /></div>
+      <div><CLOCK /></div>
     </div>
   );
 };

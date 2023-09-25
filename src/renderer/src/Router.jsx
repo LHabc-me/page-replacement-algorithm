@@ -1,15 +1,15 @@
-import { Route, Routes } from "react-router-dom";
-import TabListView from "./components/TabListView";
-import ApplicationPanel from "./components/ApplicationPanel";
+import { HashRouter, Route, Routes } from "react-router-dom";
+import * as React from "react";
 import { useRef, useState } from "react";
-import Frame from "./pages/Frame";
-import { HashRouter } from "react-router-dom";
+import { HomePage } from "./HomePage";
+import TabListView from "./components/TabListView";
 
 function Router() {
   return (
     <HashRouter>
       <Routes>
-        <Route path="/" exact element={<TabList />} />
+        <Route path="/" element={<HomePage />} />
+        {/*<Route path="/about" element={<About />} />*/}
       </Routes>
     </HashRouter>
   );

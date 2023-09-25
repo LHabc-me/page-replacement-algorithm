@@ -1,7 +1,7 @@
 import * as React from "react";
-import { AlgorithmSelect } from "./page/AlgorithmSelect";
+import { AlgorithmSelect } from "./pages/AlgorithmSelect";
 import { Button, Text } from "@fluentui/react-components";
-import { ArgumentsSetting } from "./page/ArgumentsSetting";
+import { ArgumentsSetting } from "./pages/ArgumentsSetting";
 
 export const SinglePage = () => {
 
@@ -15,7 +15,7 @@ export const SinglePage = () => {
     <div className={"min-w-480 grid grid-cols-10 h-screen w-full"}>
       <div className={"col-span-7 grid grid-rows-3 bg-blue-600 h-screen w-full"}>
         <Button className={"place-self-center"}>Home</Button>
-        {/*<Button className={"place-self-center"}>Home</Button>*/}
+        {/*<Button className={"place-self-center"}>Home</Button>*/}x
         {/*<Button className={"place-self-center"}>Home</Button>*/}
       </div>
       <div className={"container col-span-3 grid grid-rows-9 bg-black"}>
