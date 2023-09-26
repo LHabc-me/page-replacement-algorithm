@@ -24,7 +24,7 @@ const ThemeProvider = ({ children }) => {
       case "system":
         const prefersDarkMode = window.matchMedia &&
           window.matchMedia("(prefers-color-scheme: dark)").matches;
-        prefersDarkMode ? setTheme({ name: "system", value: webDarkTheme }) : setTheme({ name: "system", value: webLightTheme });
+        prefersDarkMode ? setTheme({ name: "dark", value: webDarkTheme }) : setTheme({ name: "light", value: webLightTheme });
         break;
     }
     localStorage.setItem("theme", theme);

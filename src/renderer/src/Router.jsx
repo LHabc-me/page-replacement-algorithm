@@ -1,15 +1,16 @@
 import { HashRouter, Route, Routes } from "react-router-dom";
 import * as React from "react";
 import { useRef, useState } from "react";
-import { HomePage } from "./HomePage";
+import HomePage from "./pages/HomePage";
 import TabListView from "./components/TabListView";
+import ApplicationPanel from "./components/ApplicationPanel";
+import Frame from "./pages/Frame";
 
 function Router() {
   return (
     <HashRouter>
       <Routes>
-        <Route path="/" element={<HomePage />} />
-        {/*<Route path="/about" element={<About />} />*/}
+        <Route path="/" element={<TabList />} />
       </Routes>
     </HashRouter>
   );
@@ -20,7 +21,7 @@ function TabList() {
     {
       id: 0,
       title: "欢迎",
-      component: <div>首页</div>,
+      component: <HomePage className={"h-full"} />,
       closeable: false
     }]);
   const id = useRef(0);
