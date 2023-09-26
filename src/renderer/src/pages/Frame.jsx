@@ -164,6 +164,7 @@ function Frame(props) {
     }));
   };
   const handleConfigChange = (config) => {
+    console.log(config);
     setConfig(config);
     onAlgorithmChange(config.algorithm);
     setPages(Array.from({ length: config.logicalPageCount }, (_, index) => index));
@@ -190,7 +191,7 @@ function Frame(props) {
 
 
   // 算法执行
-  const [process, setProcess] = useState(new Process(config));
+  const process = useRef(null);
   const controlPanelRef = useRef(null);
   const setStatus = (page, status) => {
     setPagesStatus(arr => arr.map((s, index) => {
@@ -210,7 +211,7 @@ function Frame(props) {
     setConfigEditable(false); // 运行时禁止修改配置
     if (currentAccessIndex.current === 0) {
       // 第一次运行时，初始化进程
-      setProcess(new Process(config));
+      process.current = new Process(config);
     }
 
     /*获取当前访问信息（地址、页号）*/
@@ -224,7 +225,7 @@ function Frame(props) {
       return;
     }
 
-    process.access(address);
+    process.current.access(address);
 
     await pageRef.current.getPages()[pageId].flash();// 闪烁正在访问的页面
     setStatus(pageId, "active");// 激活正在访问的页面
@@ -260,10 +261,10 @@ function Frame(props) {
     currentAccessIndex.current = 0;
     setConfigEditable(true);
     controlPanelRef.current.setShowPauseButton(false);
-    consoleRef.current.info(`访问次数：${process.accessCount}`);
-    consoleRef.current.info(`缺页次数：${process.pageFault}`);
-    consoleRef.current.info(`命中次数：${process.pageHit}`);
-    consoleRef.current.info(`缺页率：${process.pageFaultRate.toFixed(4) * 100}%`);
+    consoleRef.current.info(`访问次数：${process.current.accessCount}`);
+    consoleRef.current.info(`缺页次数：${process.current.pageFault}`);
+    consoleRef.current.info(`命中次数：${process.current.pageHit}`);
+    consoleRef.current.info(`缺页率：${process.current.pageFaultRate.toFixed(4) * 100}%`);
   };
 
   return (
