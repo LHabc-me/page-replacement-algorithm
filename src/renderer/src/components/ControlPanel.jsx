@@ -1,6 +1,6 @@
 import { useId, Popover, PopoverSurface, PopoverTrigger, Button, Tooltip, TabList, Tab, Card, CardHeader, Slider, Label } from "@fluentui/react-components";
 import { Play16Filled, ChevronDoubleRight16Filled, Square16Filled, Settings16Filled, Pause16Filled, PlayMultiple16Filled, Next16Filled } from "@fluentui/react-icons";
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, forwardRef, useImperativeHandle } from "react";
 
 function SecondaryMenu(props) {
   const logicalPageCountLabelId = useId("logicalPageCountLabel");
@@ -97,12 +97,13 @@ function SecondaryMenu(props) {
 }
 
 
-function ControlPanel(props) {
+const ControlPanel = forwardRef((props, ref) => {
   const [showPauseButton, setShowPauseButton] = useState(false);
   const [tip, setTip] = useState();
-  const { trigger, onRunNext, onRunAll, onPause, onTerminate, enableSettings } = props;
+  const { trigger, onRunNext, onRunAll, onPause, onTerminate, enableSettings, ...rest } = props;
+  useImperativeHandle(ref, () => ({ setShowPauseButton }));
   return (
-    <div style={props.style} className={props.className}>
+    <div {...rest}>
       {/*按钮提示*/}
       <div ref={setTip}></div>
 
@@ -139,13 +140,15 @@ function ControlPanel(props) {
           }
           <Tooltip content={"终止"} relationship={"label"} mountNode={tip} withArrow positioning={"before"}>
             <Button icon={<Square16Filled color={"red"} />} appearance={"subtle"}
-                    onClick={onTerminate}></Button>
+                    onClick={() => {
+                      setShowPauseButton(false);
+                      onTerminate();
+                    }}></Button>
           </Tooltip>
           <SecondaryMenu {...props} enableSettings={enableSettings} />
         </PopoverSurface>
       </Popover>
     </div>
   );
-}
-
+});
 export default ControlPanel;

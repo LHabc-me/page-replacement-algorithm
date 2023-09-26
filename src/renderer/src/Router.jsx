@@ -34,8 +34,7 @@ function TabList() {
                      setWindows([...windows,
                        {
                          id: id.current,
-                         title: "new",
-                         // component: <Main setWindows={setWindows} windowId={id.current} />
+                         title: "FIFO",
                          component: <Frame className={"h-full"} setWindows={setWindows} windowId={id.current} />
                        }]);
                      selectTab(id.current);

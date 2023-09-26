@@ -48,6 +48,7 @@ class Process {
     this.pageTable = new PageTable({ logicalPageCount, pageSize }); // 页表
     this.workingSet = []; // 工作集
     this.workingSetSize = workingSetSize; // 工作集大小
+    this.accessCount = 0; // 访问次数
     this.pageFault = 0; // 缺页次数
     this.pageHit = 0; // 命中次数
     this.pageFaultRate = 0; // 缺页率
@@ -56,6 +57,7 @@ class Process {
 
   // 访问逻辑地址。如果发生页面置换，返回被置换的页表项
   access(logicalAddress) {
+    this.accessCount++;
     const logicalPage = Math.floor(logicalAddress / this.pageTable.pageSize);
     const offset = logicalAddress % this.pageTable.pageSize;
     const pageTableEntry = this.pageTable.pageTableEntries[logicalPage]; // 正在访问的页表项
@@ -63,23 +65,28 @@ class Process {
     pageTableEntry.totalAccessCount++; // 更新总访问次数
     pageTableEntry.accessed = true; // 被访问后，访问位置为1
 
-    this.pageFaultRate = this.pageFault / (this.pageFault + this.pageHit); // 更新缺页率
-    if (this.workingSet.includes(logicalPage)) {// 命中
-      console.log("命中\nworkingSet=", this.workingSet);
-      this.pageHit++;
-      return null;
-    } else if (this.workingSet.length < this.workingSetSize) { // 未命中，工作集未满
-      console.log("工作集未满，直接装入内存\nworkingSet=", this.workingSet);
-      this.workingSet.push(logicalPage);
-      pageTableEntry.accessed = false; // 装入内存后，访问位置为0
-      pageTableEntry.frame = generateRandomUniqueIntsExcept(1, 0, 2 * this.pageTable.logicalPageCount - 1, this.workingSet.map(p => p.frame))[0];
-      return pageTableEntry;
-    } else if (!this.workingSet.includes(logicalPage)) {
-      // 发生缺页，进行页面置换
-      console.log("工作集已满，发生缺页，进行页面置换，workingSet=", this.workingSet);
-      this.pageFault++;
-      return replacePage(pageTableEntry, this.pageTable, this.workingSet, this.algorithm);
+    try {
+      if (this.workingSet.includes(logicalPage)) {// 命中
+        console.log("命中\nworkingSet=", this.workingSet);
+        this.pageHit++;
+        return null;
+      } else if (this.workingSet.length < this.workingSetSize) { // 未命中，工作集未满
+        console.log("工作集未满，直接装入内存\nworkingSet=", this.workingSet);
+        this.pageFault++;
+        this.workingSet.push(logicalPage);
+        pageTableEntry.accessed = false; // 装入内存后，访问位置为0
+        pageTableEntry.frame = generateRandomUniqueIntsExcept(1, 0, 2 * this.pageTable.logicalPageCount - 1, this.workingSet.map(p => p.frame))[0];
+        return pageTableEntry;
+      } else if (!this.workingSet.includes(logicalPage)) {
+        // 发生缺页，进行页面置换
+        console.log("工作集已满，发生缺页，进行页面置换，workingSet=", this.workingSet);
+        this.pageFault++;
+        return replacePage(pageTableEntry, this.pageTable, this.workingSet, this.algorithm);
+      }
+    } finally {
+      this.pageFaultRate = this.pageFault / (this.pageFault + this.pageHit); // 更新缺页率
     }
+
   }
 }
 
