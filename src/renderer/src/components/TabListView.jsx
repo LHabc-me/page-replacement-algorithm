@@ -1,9 +1,9 @@
-import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useContext, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Button, TabList, Tab, PopoverTrigger, PopoverSurface, Popover } from "@fluentui/react-components";
 import { Add12Regular, Dismiss12Regular, MoreHorizontalRegular } from "@fluentui/react-icons";
 import { AnimatePresence, motion } from "framer-motion";
 import KeepAlive from "react-activation";
-
+import { TipContext } from "./TipContext";
 
 /*
 windows: {
@@ -24,6 +24,10 @@ after: ReactNode // 标签页列表后的元素
 
 function TabListView(props) {
   let { windows, onAdd, onClose, defaultSelectedId, before, after, onSelectedIdChange } = props;
+
+
+  const { tips, setTips } = useContext(TipContext);// 用于显示教程
+
   const [selectedTabsId, setSelectedTabsId] = useState([defaultSelectedId]);
   const [hiddenTabsId, setHiddenTabsId] = useState([]); // 标签页过多时隐藏的标签页
 
@@ -125,6 +129,7 @@ function TabListView(props) {
       window.removeEventListener("resize", adjustHeight);
     };
   }, [tabListRoot, tabList]);
+
 
   const tabListView = windows.map(tab => {
     return {
@@ -229,9 +234,17 @@ function TabListView(props) {
 
         {/* 新建标签，并选择新标签 */}
         <Button appearance={"subtle"}
-                onClick={() => onAdd(selectTab)}
+                onClick={() => {
+                  onAdd(selectTab);
+                  if (tips.stepIndex !== 0) {
+                    setTimeout(() => {
+                      setTips(o => ({ ...o, stepIndex: tips.stepIndex + 1 }));
+                    }, 1000);
+                  }
+                }}
                 icon={<Add12Regular />}
-                ref={newBtn}>
+                ref={newBtn}
+                className={"tablistview-newbtn"}>
         </Button>
         <div ref={afterElement}>
           {after}

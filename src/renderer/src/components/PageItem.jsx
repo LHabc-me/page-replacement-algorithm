@@ -21,7 +21,7 @@ const PageItem = forwardRef((props, ref) => {
   useEffect(() => {
     const backgroundColor = (() => {
       if (status === "active") return theme.value.colorPaletteLightGreenBackground3;
-      else if (status === "normal") return theme.value.colorBrandForegroundOnLight;
+      else if (status === "normal") return theme.value.colorBrandBackground;
       else if (status === "error") return theme.value.colorStatusDangerForeground3;
     })();
     animation.start({
@@ -37,7 +37,7 @@ const PageItem = forwardRef((props, ref) => {
         style={{
           backgroundColor: (() => {
             if (status === "active") return theme.value.colorPaletteLightGreenBackground3;
-            else if (status === "normal") return theme.value.colorBrandForegroundOnLight;
+            else if (status === "normal") return theme.value.colorBrandBackground;
             else if (status === "error") return theme.value.colorStatusDangerForeground3;
           })()
         }}

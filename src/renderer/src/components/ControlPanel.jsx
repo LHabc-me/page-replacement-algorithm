@@ -1,6 +1,6 @@
-import { useId, Popover, PopoverSurface, PopoverTrigger, Button, Tooltip, TabList, Tab, Card, CardHeader, Slider, Label } from "@fluentui/react-components";
-import { Play16Filled, ChevronDoubleRight16Filled, Square16Filled, Settings16Filled, Pause16Filled, PlayMultiple16Filled, Next16Filled } from "@fluentui/react-icons";
-import React, { useEffect, useState, useRef, forwardRef, useImperativeHandle } from "react";
+import { useId, Popover, PopoverSurface, PopoverTrigger, Button, Tooltip, TabList, Tab, Slider, Label } from "@fluentui/react-components";
+import { Play16Filled, Square16Filled, Settings16Filled, Pause16Filled, PlayMultiple16Filled } from "@fluentui/react-icons";
+import { useState, forwardRef, useImperativeHandle } from "react";
 
 function SecondaryMenu(props) {
   const logicalPageCountLabelId = useId("logicalPageCountLabel");

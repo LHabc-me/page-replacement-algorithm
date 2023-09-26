@@ -1,0 +1,8 @@
+.react-joyride__tooltip *:focus {
+    /*outline: white solid 2px;*/
+    outline: none;
+}
+
+.react-joyride__beacon {
+    outline: none;
+}

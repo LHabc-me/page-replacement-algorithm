@@ -167,13 +167,13 @@ function Frame(props) {
     setConfig(config);
     onAlgorithmChange(config.algorithm);
     setPages(Array.from({ length: config.logicalPageCount }, (_, index) => index));
-    setPagesStatus(pages.map(() => "normal"));
+    setPagesStatus(Array.from({ length: config.logicalPageCount }, (_, index) => index).map(() => "normal"));
     consoleRef.current.info("配置已更新");
   };
 
   // 工作集组件
   const worksetProps = {
-    className: "flex-1",
+    className: "h-full",
     ref: workingSetRef,
     size: config.workingSetSize,
     logicalPageCount: config.logicalPageCount,
@@ -269,7 +269,7 @@ function Frame(props) {
   return (
     <div {...rest} >
       <div className={"grid grid-cols-1 grid-rows-2 h-full p-5"}>
-        <div>
+        <div className={"pages-container"}>
           <Pages ref={pageRef}
                  all={pages}
                  pagesStatus={pagesStatus}
@@ -286,23 +286,27 @@ function Frame(props) {
         </div>
         <div className={"flex flex-row"}>
           <div className={"flex-1 flex flex-col"}>
-            {WorkSet}
-            <div className={"flex flex-row justify-between"}>
-              <div className={"mt-1.5"}>
-                访问序列
-              </div>
-              <RadioGroup value={accessMode}
-                          onChange={(_, data) => setAccessMode(data.value)}
-                          layout={"horizontal"}
-                          disabled={!configEditable}>
-                <Radio value={"id"} label={"输入页号"} />
-                <Radio value={"address"} label={"输入地址"} />
-              </RadioGroup>
+            <div className={"flex-1 workset-container"}>
+              {WorkSet}
             </div>
-            <Textarea value={accessSequence} onChange={handleAccessSequenceChange} />
+            <div className={"flex flex-col access-sequence-container"}>
+              <div className={"flex flex-row justify-between"}>
+                <div className={"mt-1.5"}>
+                  访问序列
+                </div>
+                <RadioGroup value={accessMode}
+                            onChange={(_, data) => setAccessMode(data.value)}
+                            layout={"horizontal"}
+                            disabled={!configEditable}>
+                  <Radio value={"id"} label={"输入页号"} />
+                  <Radio value={"address"} label={"输入地址"} />
+                </RadioGroup>
+              </div>
+              <Textarea value={accessSequence} onChange={handleAccessSequenceChange} />
+            </div>
           </div>
           <div className={"w-1/4 flex flex-col"}>
-            <Console className={"overflow-y-scroll flex-1"} ref={consoleRef} />
+            <Console className={"overflow-y-scroll flex-1 console-container"} ref={consoleRef} />
             <div>
               <ControlPanel ref={controlPanelRef}
                             config={config}
@@ -318,7 +322,8 @@ function Frame(props) {
                                   <Button icon={<Edit20Regular />}
                                           appearance={"secondary"}
                                           style={{ borderRadius: "100%" }}
-                                          size={"large"}>
+                                          size={"large"}
+                                          className={"control-panel-container"}>
                                   </Button>
                                 </div>
                               } />
