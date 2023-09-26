@@ -3,7 +3,7 @@ import { motion, AnimatePresence, AnimateSharedLayout } from "framer-motion";
 import PageItem from "../PageItem";
 
 const FIFO = forwardRef((props, ref) => {
-  const { size, ...rest } = props;
+  const { size, pageSize, logicalPageCount, ...rest } = props;
   const [workingSet, setWorkingSet] = useState([]);
   const pagesRef = useRef([]);
   const includes = (page) => {

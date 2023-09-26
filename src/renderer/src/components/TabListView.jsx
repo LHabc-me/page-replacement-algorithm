@@ -236,10 +236,11 @@ function TabListView(props) {
         <Button appearance={"subtle"}
                 onClick={() => {
                   onAdd(selectTab);
+                  setTips(o => ({ ...o, run: false }));
                   if (tips.stepIndex !== 0) {
                     setTimeout(() => {
-                      setTips(o => ({ ...o, stepIndex: tips.stepIndex + 1 }));
-                    }, 1000);
+                      setTips(o => ({ ...o, run: true, stepIndex: tips.stepIndex + 1 }));
+                    }, 800);
                   }
                 }}
                 icon={<Add12Regular />}

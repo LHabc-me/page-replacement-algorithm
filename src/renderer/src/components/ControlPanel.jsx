@@ -100,7 +100,10 @@ function SecondaryMenu(props) {
 const ControlPanel = forwardRef((props, ref) => {
   const [showPauseButton, setShowPauseButton] = useState(false);
   const [tip, setTip] = useState();
-  const { trigger, onRunNext, onRunAll, onPause, onTerminate, enableSettings, ...rest } = props;
+  const {
+    trigger, onRunNext, onRunAll, onPause, onTerminate, enableSettings,
+    config, onConfigChange, ...rest
+  } = props;
   useImperativeHandle(ref, () => ({ setShowPauseButton }));
   return (
     <div {...rest}>
