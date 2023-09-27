@@ -11,7 +11,8 @@ function App() {
       id: 0,
       title: "欢迎",
       component: <HomePage className={"h-full"} />,
-      closeable: false
+      closeable: false,
+      draggable: false
     }]);
   const id = useRef(0);
 

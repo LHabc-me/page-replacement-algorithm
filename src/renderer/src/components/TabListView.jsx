@@ -12,6 +12,7 @@ windows: {
   icon: ReactNode       // 标签页图标
   component: ReactNode  // 标签页内容
   closeable: boolean    // 设置为false时可以防止关闭标签页
+  draggable: boolean    // 设置为false时可以防止拖动标签页
 }
 onAdd: function(selectTab: function(id: tab.id)) // selectTab为选择新标签页的回调函数
 onClose: function(id: tab.id) // 关闭标签页的回调函数，需要在此函数中删除标签页。会自动选择新标签页。
@@ -147,7 +148,7 @@ function TabListView(props) {
              }}
              className={"h-8"}
              style={{ width: tabWidth }}
-             draggable
+             draggable={tab.draggable !== false}
              onDrag={(e) => {
                const left = 0, top = tabList.current.clientHeight;
                const width = tabListRoot.current.clientWidth, height = hoverHeight;
