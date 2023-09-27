@@ -26,7 +26,7 @@ function replacePage(pageTableEntry, pageTable, workingSet, algorithm) {
 
   }
   result.frame = -1;
-  workingSet.splice(workingSet.find(i => i === result.logicalPage), 1);
+  workingSet.splice(workingSet.findIndex(i => i === result.logicalPage), 1);
   workingSet.push(pageTableEntry.logicalPage);
   return result;
 }

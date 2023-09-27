@@ -165,7 +165,6 @@ function Frame(props) {
     }));
   };
   const handleConfigChange = (config) => {
-    console.log(config);
     setConfig(config);
     onAlgorithmChange(config.algorithm);
     setPages(Array.from({ length: config.logicalPageCount }, (_, index) => index));
@@ -174,21 +173,21 @@ function Frame(props) {
   };
 
   // 工作集组件
-  const worksetProps = {
-    className: "h-full",
-    ref: workingSetRef,
-    size: config.workingSetSize,
-    logicalPageCount: config.logicalPageCount,
-    pageSize: config.pageSize
-  };
   const [WorkSet, setWorkSet] = useState(<div></div>);
   useEffect(() => {
+    const worksetProps = {
+      className: "h-full",
+      ref: workingSetRef,
+      size: config.workingSetSize,
+      logicalPageCount: config.logicalPageCount,
+      pageSize: config.pageSize
+    };
     if (config.algorithm === "FIFO") setWorkSet(<FIFO {...worksetProps} />);
     else if (config.algorithm === "LRU") setWorkSet(<LRU {...worksetProps} />);
     else if (config.algorithm === "NUR") setWorkSet(<FIFO {...worksetProps} />);
     else if (config.algorithm === "CLOCK") setWorkSet(<FIFO {...worksetProps} />);
     else setWorkSet(<div></div>);
-  }, [config.algorithm, worksetProps]);
+  }, [config]);
 
 
   // 算法执行
@@ -232,7 +231,7 @@ function Frame(props) {
     setStatus(pageId, "active");// 激活正在访问的页面
     consoleRef.current.info(`正在访问页面${pageId} 逻辑地址${address}`);
     if (!workingSetRef.current.includes(pageId)) {
-      const replacedId = workingSetRef.current.add(pageId);
+      const replacedId = workingSetRef.current.access(pageId);
       consoleRef.current.success(`页面${pageId}不在工作集中，将其加入工作集`);
       setTimeout(() => {
         if (replacedId !== null) {
@@ -241,6 +240,7 @@ function Frame(props) {
         }
       }, 700);
     } else {
+      workingSetRef.current.access(pageId);
       consoleRef.current.success(`页面${pageId}已在工作集中`);
     }
     currentAccessIndex.current++;

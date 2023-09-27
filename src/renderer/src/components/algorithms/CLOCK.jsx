@@ -47,8 +47,8 @@ const CLOCK = forwardRef((props, ref) => {
     return workingSet.length === size;
   };
 
-  // add: 输入页面号，返回缺页号(没有缺页返回null)
-  const add = (page) => {
+  // access: 输入页面号，返回缺页号(没有缺页返回null)
+  const access = (page) => {
     if (includes(page)) {
       moveToBack(page);
       return null;
@@ -63,7 +63,7 @@ const CLOCK = forwardRef((props, ref) => {
     }
   };
 
-  useImperativeHandle(ref, () => ({ add, includes, clear }));
+  useImperativeHandle(ref, () => ({ access, includes, clear }));
 
 
   const blockLength = 36;

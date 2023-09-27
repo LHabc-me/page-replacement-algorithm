@@ -7,10 +7,7 @@ const FIFO = forwardRef((props, ref) => {
   const [workingSet, setWorkingSet] = useState([]);
   const pagesRef = useRef([]);
   const includes = (page) => {
-    if (workingSet.includes(page)) {
-      return pagesRef.current[workingSet.indexOf(page)];
-    }
-    return false;
+    return workingSet.includes(page);
   };
   const pushBack = (page) => {
     setWorkingSet(s => [...s, page]);
@@ -27,7 +24,7 @@ const FIFO = forwardRef((props, ref) => {
   const isFull = () => {
     return workingSet.length === size;
   };
-  const add = (page) => {
+  const access = (page) => {
     if (includes(page)) return null;
     if (!isFull()) {
       pushBack(page);
@@ -39,8 +36,8 @@ const FIFO = forwardRef((props, ref) => {
     }
   };
 
-  // add: 输入页面号，返回缺页号(没有缺页返回null)
-  useImperativeHandle(ref, () => ({ add, includes, clear }));
+  // access: 输入页面号，返回缺页号(没有缺页返回null)
+  useImperativeHandle(ref, () => ({ access, includes, clear }));
 
   const blockLength = 36;
   const textStyle = {

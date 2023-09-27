@@ -1,4 +1,4 @@
-import { forwardRef, useImperativeHandle, useState, useRef } from "react";
+import { forwardRef, useImperativeHandle, useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence, AnimateSharedLayout } from "framer-motion";
 import PageItem from "../PageItem";
 import { Process } from "../../algorithms";
@@ -12,17 +12,17 @@ const LRU = forwardRef((props, ref) => {
   const { size, logicalPageCount, pageSize } = props;
   const [workingSet, setWorkingSet] = useState([]);
   const pagesRef = useRef([]);
-  const [process, setProcess] = useState(new Process({
-    logicalPageCount,
-    pageSize,
-    workingSetSize: size,
-    algorithm: "LRU"
-  }));
+  const process = useRef(null);
+  useEffect(() => {
+    process.current = new Process({
+      logicalPageCount,
+      pageSize,
+      workingSetSize: size,
+      algorithm: "LRU"
+    });
+  }, [logicalPageCount, pageSize, size]);
   const includes = (page) => {
-    if (workingSet.includes(page)) {
-      return pagesRef.current[workingSet.indexOf(page)];
-    }
-    return false;
+    return workingSet.includes(page);
   };
   const moveToBack = (page) => {
     const index = workingSet.indexOf(page);
@@ -31,8 +31,6 @@ const LRU = forwardRef((props, ref) => {
     newWorkingSet.splice(index, 1);
     newWorkingSet.push(page);
     setWorkingSet(newWorkingSet);
-
-    console.log("workingSet最后一个元素: " + workingSet.indexOf(-1));
   };
   const pushBack = (page) => {
     setWorkingSet(s => [...s, page]);
@@ -50,23 +48,24 @@ const LRU = forwardRef((props, ref) => {
     return workingSet.length === size;
   };
 
-  // add: 输入页面号，返回缺页号(没有缺页返回null)
-  const add = (page) => {
-    if (!isFull()) {
+  // access: 输入页面号，返回缺页号(没有缺页返回null)
+  const access = (page) => {
+    const result = process.current.access(page * pageSize);
+    console.log(result);
+    if (!isFull()) {// 工作集未满
       pushBack(page);
       return null;
-    }
-    if (includes(page)) {
+    } else if (includes(page)) {// 工作集已满，且包含page，将page移至工作集末尾
       moveToBack(page);
       return null;
+    } else {// 工作集已满，且不包含page，将工作集首元素移除，将page加入工作集末尾
+      popFront();
+      pushBack(page);
+      return result;
     }
-    popFront();
-    pushBack(page);
-    console.log(page * pageSize);
-    return process.access(page * pageSize).logicalPage;
   };
 
-  useImperativeHandle(ref, () => ({ add, includes, clear }));
+  useImperativeHandle(ref, () => ({ access, includes, clear }));
 
 
   const blockLength = 36;
