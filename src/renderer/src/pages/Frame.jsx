@@ -240,6 +240,8 @@ function Frame(props) {
           consoleRef.current.error(`从工作集中移除页面${replacedId}`);
         }
       }, 700);
+    } else {
+      consoleRef.current.success(`页面${pageId}已在工作集中`);
     }
     currentAccessIndex.current++;
   };
