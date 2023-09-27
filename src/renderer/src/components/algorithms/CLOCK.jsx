@@ -1,16 +1,35 @@
 import { forwardRef, useImperativeHandle, useState, useRef } from "react";
 import { motion, AnimatePresence, AnimateSharedLayout } from "framer-motion";
 import PageItem from "../PageItem";
+import { Process } from "../../algorithms";
 
-const FIFO = forwardRef((props, ref) => {
-  const { size, pageSize, logicalPageCount, ...rest } = props;
+const CLOCK = forwardRef((props, ref) => {
+  /**
+   *     size: config.workingSetSize,
+   *     logicalPageCount: config.logicalPageCount,
+   *     pageSize: config.pageSize
+   */
+  const { size, ...rest } = props;
   const [workingSet, setWorkingSet] = useState([]);
   const pagesRef = useRef([]);
+  const config = {};
+  const [process, setProcess] = useState(new Process({
+    ...rest,
+    algorithm: "LRU"
+  }));
   const includes = (page) => {
     if (workingSet.includes(page)) {
       return pagesRef.current[workingSet.indexOf(page)];
     }
     return false;
+  };
+  const moveToBack = (page) => {
+    const index = workingSet.indexOf(page);
+    if (index === -1) return;
+    const newWorkingSet = [...workingSet];
+    newWorkingSet.splice(index, 1);
+    newWorkingSet.push(page);
+    setWorkingSet(newWorkingSet);
   };
   const pushBack = (page) => {
     setWorkingSet(s => [...s, page]);
@@ -27,20 +46,25 @@ const FIFO = forwardRef((props, ref) => {
   const isFull = () => {
     return workingSet.length === size;
   };
+
+  // add: 输入页面号，返回缺页号(没有缺页返回null)
   const add = (page) => {
-    if (includes(page)) return null;
+    if (includes(page)) {
+      moveToBack(page);
+      return null;
+    }
     if (!isFull()) {
       pushBack(page);
       return null;
     } else {
       popFront();
       pushBack(page);
-      return workingSet[0];
+      return process.access(page * this.pageSize);
     }
   };
 
-  // add: 输入页面号，返回缺页号(没有缺页返回null)
   useImperativeHandle(ref, () => ({ add, includes, clear }));
+
 
   const blockLength = 36;
   const textStyle = {
@@ -95,4 +119,4 @@ const FIFO = forwardRef((props, ref) => {
   );
 });
 
-export default FIFO;
+export default CLOCK;

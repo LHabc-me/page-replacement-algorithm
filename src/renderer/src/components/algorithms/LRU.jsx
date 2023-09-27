@@ -1,16 +1,38 @@
 import { forwardRef, useImperativeHandle, useState, useRef } from "react";
 import { motion, AnimatePresence, AnimateSharedLayout } from "framer-motion";
 import PageItem from "../PageItem";
+import { Process } from "../../algorithms";
 
-const FIFO = forwardRef((props, ref) => {
-  const { size, pageSize, logicalPageCount, ...rest } = props;
+const LRU = forwardRef((props, ref) => {
+  /**
+   *     size: config.workingSetSize,
+   *     logicalPageCount: config.logicalPageCount,
+   *     pageSize: config.pageSize
+   */
+  const { size, logicalPageCount, pageSize } = props;
   const [workingSet, setWorkingSet] = useState([]);
   const pagesRef = useRef([]);
+  const [process, setProcess] = useState(new Process({
+    logicalPageCount,
+    pageSize,
+    workingSetSize: size,
+    algorithm: "LRU"
+  }));
   const includes = (page) => {
     if (workingSet.includes(page)) {
       return pagesRef.current[workingSet.indexOf(page)];
     }
     return false;
+  };
+  const moveToBack = (page) => {
+    const index = workingSet.indexOf(page);
+    if (index === -1) return;
+    const newWorkingSet = [...workingSet];
+    newWorkingSet.splice(index, 1);
+    newWorkingSet.push(page);
+    setWorkingSet(newWorkingSet);
+
+    console.log("workingSet最后一个元素: " + workingSet.indexOf(-1));
   };
   const pushBack = (page) => {
     setWorkingSet(s => [...s, page]);
@@ -27,20 +49,25 @@ const FIFO = forwardRef((props, ref) => {
   const isFull = () => {
     return workingSet.length === size;
   };
+
+  // add: 输入页面号，返回缺页号(没有缺页返回null)
   const add = (page) => {
-    if (includes(page)) return null;
     if (!isFull()) {
       pushBack(page);
       return null;
-    } else {
-      popFront();
-      pushBack(page);
-      return workingSet[0];
     }
+    if (includes(page)) {
+      moveToBack(page);
+      return null;
+    }
+    popFront();
+    pushBack(page);
+    console.log(page * pageSize);
+    return process.access(page * pageSize).logicalPage;
   };
 
-  // add: 输入页面号，返回缺页号(没有缺页返回null)
   useImperativeHandle(ref, () => ({ add, includes, clear }));
+
 
   const blockLength = 36;
   const textStyle = {
@@ -55,11 +82,10 @@ const FIFO = forwardRef((props, ref) => {
   };
 
   return (
-    <div {...rest}>
+    <div>
       <div className={"h-full flex flex-col justify-center"}>
         <div className={"flex flex-row gap-1.5 justify-center flex-wrap"}>
           <div style={textStyle} className={"items-start"}>
-            队首
           </div>
           <div className={"flex flex-row gap-1.5 justify-center flex-wrap"}
                style={{
@@ -87,7 +113,6 @@ const FIFO = forwardRef((props, ref) => {
             </AnimateSharedLayout>
           </div>
           <div style={textStyle} className={"items-end"}>
-            队尾
           </div>
         </div>
       </div>
@@ -95,4 +120,4 @@ const FIFO = forwardRef((props, ref) => {
   );
 });
 
-export default FIFO;
+export default LRU;

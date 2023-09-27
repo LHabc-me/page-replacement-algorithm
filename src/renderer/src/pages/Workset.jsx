@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Avatar, Button, Card, makeStyles, shorthands, Switch, Text, tokens } from "@fluentui/react-components";
 import { Add12Regular, FlashSettings20Filled } from "@fluentui/react-icons";
 import { motion } from "framer-motion";
-import CLOCK from "./CLOCK";
+import CLOCK from "../components/algorithms/CLOCK";
 
 const useStyles = makeStyles({
   container: {

@@ -1,11 +1,12 @@
 import ControlPanel from "../components/ControlPanel";
-import { Button, Field, Radio, RadioGroup, Textarea, Toast, ToastBody, Toaster, ToastTitle, Tooltip, useId, useToastController } from "@fluentui/react-components";
+import { Button, Radio, RadioGroup, Textarea } from "@fluentui/react-components";
 import { Edit20Regular } from "@fluentui/react-icons";
-import { useEffect, useRef, useState, forwardRef, useImperativeHandle } from "react";
+import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
 import PageItem from "../components/PageItem";
 import FIFO from "../components/algorithms/FIFO";
-import { WindupChildren, OnChar } from "windups";
+import { OnChar, WindupChildren } from "windups";
 import { Process } from "../algorithms";
+import LRU from "../components/algorithms/LRU";
 
 const Console = forwardRef((props, ref) => {
   const consoleRef = useRef(null);
@@ -183,7 +184,7 @@ function Frame(props) {
   const [WorkSet, setWorkSet] = useState(<div></div>);
   useEffect(() => {
     if (config.algorithm === "FIFO") setWorkSet(<FIFO {...worksetProps} />);
-    else if (config.algorithm === "LRU") setWorkSet(<FIFO {...worksetProps} />);
+    else if (config.algorithm === "LRU") setWorkSet(<LRU {...worksetProps} />);
     else if (config.algorithm === "NUR") setWorkSet(<FIFO {...worksetProps} />);
     else if (config.algorithm === "CLOCK") setWorkSet(<FIFO {...worksetProps} />);
     else setWorkSet(<div></div>);
