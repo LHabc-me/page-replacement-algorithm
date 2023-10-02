@@ -90,8 +90,8 @@ class Process {
         if (this.algorithm === "CLOCK") {
           pageTableEntry.accessed = true; // 被访问后，访问位置为1
           console.log("logicalPage: " + logicalPage);
-          this.pageTable._setClockHand((this.workingSet.indexOf(logicalPage) + 1) % this.workingSetSize); // 更新时钟指针
-          console.log("更新后指针: " + this.pageTable.clockHand);
+          // this.pageTable._setClockHand((this.workingSet.indexOf(logicalPage) + 1) % this.workingSetSize); // 更新时钟指针
+          // console.log("更新后指针: " + this.pageTable.clockHand);
           // console.log("this.workingSet.indexOf(logicalPage): " + this.workingSet.indexOf(logicalPage));
         }
 
@@ -103,7 +103,7 @@ class Process {
         console.log("工作集未满，直接装入内存\nworkingSet=", this.workingSet);
 
         if (this.algorithm === "CLOCK") {
-          this.pageTable._setClockHand((this.pageTable.clockHand + 1) % this.workingSetSize); // 更新时钟指针
+          // this.pageTable._setClockHand((this.pageTable.clockHand + 1) % this.workingSetSize); // 更新时钟指针
           console.log("更新后指针: " + this.pageTable.clockHand);
           // console.log("(this.workingSet.indexOf(logicalPage) + 1) % this.workingSet.length: " + (this.workingSet.indexOf(logicalPage) + 1) % this.workingSet.length);
         }

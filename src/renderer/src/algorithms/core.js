@@ -27,8 +27,15 @@ function replacePage(pageTableEntry, pageTable, workingSet, algorithm) {
   }
   // if (algorithm !== PAGE_REPLACEMENT_ALGORITHMS.CLOCK)
   result.frame = -1;
-  workingSet.splice(workingSet.findIndex(i => i === result.logicalPage), 1);
-  workingSet.push(pageTableEntry.logicalPage);
+  if (algorithm !== PAGE_REPLACEMENT_ALGORITHMS.CLOCK) {
+    workingSet.splice(workingSet.findIndex(i => i === result.logicalPage), 1);
+    workingSet.push(pageTableEntry.logicalPage);
+  } else {
+    workingSet[pageTable.clockHand] = pageTableEntry.logicalPage;
+    console.log("clockHand: " + pageTable.clockHand);
+    pageTable._setClockHand(((pageTable.clockHand + 1) % workingSet.length));
+  }
+
   return result;
 }
 
@@ -120,8 +127,8 @@ function replacePageNUR(pageTableEntry, pageTable, workingSet) {
 
 // 时钟页面置换算法
 function replacePageCLOCK(pageTableEntry, pageTable, workingSet) {
-  const clock = pageTable.clockHand;
-  console.log("clockHand: " + clock);
+
+  // console.log("clockHand: " + clock);
   const workingSetLength = workingSet.length;
   console.log("workingSet: " + workingSet);
 
@@ -135,6 +142,7 @@ function replacePageCLOCK(pageTableEntry, pageTable, workingSet) {
 
     // 10.1记录：
     // 1. 应该对workingSet进行操作，而不是对pageTable进行操作
+    const clock = pageTable.clockHand;
     console.log("workingSet[clock]: " + workingSet[clock]);
     const currentEntry = pageTable.pageTableEntries[workingSet[clock]];
 

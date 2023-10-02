@@ -82,7 +82,6 @@ const CLOCK = forwardRef((props, ref) => {
         // 如果工作集已满，则从clockHand指向的位置开始逐项访问，直至访问至访问位为0的页面，将page替换为该页面
         // for (let i = clockHand; ; i++) {
         //   if (i === size) i = 0;
-        console.log("111111111111111111");
         // if (!pageEntry.accessed) {
         // 找到了访问位为0的页面，将page替换为该页面，更新页面的访问位
         // const index = workingSet.indexOf(pageEntry);

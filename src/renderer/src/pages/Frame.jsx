@@ -234,6 +234,7 @@ function Frame(props) {
     consoleRef.current.info(`正在访问页面${pageId} 逻辑地址${address}`);
     if (!workingSetRef.current.includes(pageId)) {
       const replacedId = workingSetRef.current.access(pageId);
+      console.log("replace", replacedId);
       consoleRef.current.success(`页面${pageId}不在工作集中，将其加入工作集`);
       setTimeout(() => {
         if (replacedId !== null) {
