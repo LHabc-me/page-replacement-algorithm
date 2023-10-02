@@ -7,6 +7,8 @@ import FIFO from "../components/algorithms/FIFO";
 import { OnChar, WindupChildren } from "windups";
 import { Process } from "../algorithms";
 import LRU from "../components/algorithms/LRU";
+import NUR from "../components/algorithms/NUR";
+import CLOCK from "../components/algorithms/CLOCK";
 
 const Console = forwardRef((props, ref) => {
   const consoleRef = useRef(null);
@@ -184,8 +186,8 @@ function Frame(props) {
     };
     if (config.algorithm === "FIFO") setWorkSet(<FIFO {...worksetProps} />);
     else if (config.algorithm === "LRU") setWorkSet(<LRU {...worksetProps} />);
-    else if (config.algorithm === "NUR") setWorkSet(<FIFO {...worksetProps} />);
-    else if (config.algorithm === "CLOCK") setWorkSet(<FIFO {...worksetProps} />);
+    else if (config.algorithm === "NUR") setWorkSet(<NUR {...worksetProps} />);
+    else if (config.algorithm === "CLOCK") setWorkSet(<CLOCK {...worksetProps} />);
     else setWorkSet(<div></div>);
   }, [config]);
 

@@ -51,7 +51,7 @@ const LRU = forwardRef((props, ref) => {
   // access: 输入页面号，返回缺页号(没有缺页返回null)
   const access = (page) => {
     const result = process.current.access(page * pageSize);
-    console.log(result);
+    // console.log(result);
     if (!isFull()) {// 工作集未满
       pushBack(page);
       return null;
@@ -81,10 +81,11 @@ const LRU = forwardRef((props, ref) => {
   };
 
   return (
-    <div>
+    <div className={"h-full"}>
       <div className={"h-full flex flex-col justify-center"}>
         <div className={"flex flex-row gap-1.5 justify-center flex-wrap"}>
           <div style={textStyle} className={"items-start"}>
+            最旧
           </div>
           <div className={"flex flex-row gap-1.5 justify-center flex-wrap"}
                style={{
@@ -98,8 +99,8 @@ const LRU = forwardRef((props, ref) => {
                       key={page}
                       layout
                       initial={{ opacity: 0, x: 20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      exit={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -20 }}
                       transition={{ duration: 0.2 }}>
                       <PageItem pageNumber={page}
                                 ref={ref => pagesRef.current[index] = ref}
@@ -112,6 +113,7 @@ const LRU = forwardRef((props, ref) => {
             </AnimateSharedLayout>
           </div>
           <div style={textStyle} className={"items-end"}>
+            最新
           </div>
         </div>
       </div>
