@@ -4,6 +4,7 @@
   "description": "An Electron application with React",
   "main": "./out/main/index.js",
   "author": "example.com",
+  "license": "MIT",
   "homepage": "https://www.electronjs.org",
   "scripts": {
     "format": "prettier --write .",
