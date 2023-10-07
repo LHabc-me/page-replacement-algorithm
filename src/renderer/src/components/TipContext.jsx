@@ -30,11 +30,16 @@ const TipProvider = ({ children }) => {
       },
       {
         target: ".application-panel",
-        content: "在此切换主题"
+        content: "在此切换主题和控制多页面"
       },
       {
         target: ".tablistview-newbtn",
-        content: "点击此处打开新页面，开始使用模拟器",
+        content: (
+          <div>
+            点击此处打开新页面，开始使用模拟器<br /><br />
+            你可以在此处打开多个页面，每个页面都可以配置不同的算法和访问序列<br /><br />
+            拖动页面标题栏到下方可以移动页面<br /><br />
+          </div>),
         disableBeacon: true,
         disableOverlayClose: true,
         hideCloseButton: true,

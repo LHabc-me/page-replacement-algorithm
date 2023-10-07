@@ -176,10 +176,6 @@ function TabListView(props) {
                    [tab.id]: positioning
                  });
                  setSelectedTabsId([...unOverLapsId.filter(id => id !== tab.id), tab.id]);
-                 console.log({
-                   ...Object.fromEntries(unOverLapsId.map(id => [id, windowsLayout[id]])),
-                   [tab.id]: positioning
-                 });
                }
              }}>
           <div className={"flex justify-between"}>

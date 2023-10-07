@@ -1,7 +1,7 @@
 import ControlPanel from "../components/ControlPanel";
 import { Button, Radio, RadioGroup, Textarea } from "@fluentui/react-components";
 import { Edit20Regular } from "@fluentui/react-icons";
-import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
+import { forwardRef, useContext, useEffect, useImperativeHandle, useRef, useState } from "react";
 import PageItem from "../components/PageItem";
 import FIFO from "../components/algorithms/FIFO";
 import { OnChar, WindupChildren } from "windups";
@@ -9,6 +9,7 @@ import { Process } from "../algorithms";
 import LRU from "../components/algorithms/LRU";
 import NUR from "../components/algorithms/NUR";
 import CLOCK from "../components/algorithms/CLOCK";
+import { ThemeContext } from "../components/ThemeContext";
 
 const Console = forwardRef((props, ref) => {
   const consoleRef = useRef(null);
@@ -129,7 +130,7 @@ function parseNumberString(input) {
   return decimalNumbers.filter(number => !isNaN(number));
 }
 
-function Frame(props) {
+const Frame = forwardRef((props, ref) => {
   const { setWindows, windowId, ...rest } = props;
 
   const workingSetRef = useRef(null);
@@ -234,7 +235,6 @@ function Frame(props) {
     consoleRef.current.info(`正在访问页面${pageId} 逻辑地址${address}`);
     if (!workingSetRef.current.includes(pageId)) {
       const replacedId = workingSetRef.current.access(pageId);
-      console.log("replace", replacedId);
       consoleRef.current.success(`页面${pageId}不在工作集中，将其加入工作集`);
       setTimeout(() => {
         if (replacedId !== null) {
@@ -260,6 +260,17 @@ function Frame(props) {
     consoleRef.current.info("算法已终止");
     endAlgorithm();
   };
+
+  useImperativeHandle(ref, () => ({ runAll, runNext, pause, terminate }));
+  useEffect(() => {
+    window[`Frame_${windowId}`] = {
+      runAll,
+      runNext,
+      pause,
+      terminate
+    };
+  }, [consoleRef, currentAccessIndex, workingSetRef, process, accessSequence, accessMode, config, pageRef, pages, pagesStatus, windowId]);
+
   const endAlgorithm = () => {
     clearInterval(algorithmIntervalId.current);
     workingSetRef.current.clear();
@@ -267,15 +278,27 @@ function Frame(props) {
     currentAccessIndex.current = 0;
     setConfigEditable(true);
     controlPanelRef.current.setShowPauseButton(false);
-    consoleRef.current.info(`访问次数：${process.current.accessCount}`);
-    consoleRef.current.info(`缺页次数：${process.current.pageFault}`);
-    consoleRef.current.info(`命中次数：${process.current.pageHit}`);
-    consoleRef.current.info(`缺页率：${process.current.pageFaultRate.toFixed(4) * 100}%`);
+    consoleRef.current.info(`访问次数：${process.current?.accessCount ?? 0}`);
+    consoleRef.current.info(`缺页次数：${process.current?.pageFault ?? 0}`);
+    consoleRef.current.info(`命中次数：${process.current?.pageHit ?? 0}`);
+    consoleRef.current.info(`缺页率：${(process.current?.pageFaultRate?.toFixed(4) ?? 0) * 100}%`);
   };
+
+  const [style, setStyle] = useState(null);
+  const { theme } = useContext(ThemeContext);
+  useEffect(() => {
+    if (theme.name === "light") {
+      setStyle({
+        backgroundColor: theme.value.colorNeutralBackground6
+      });
+    } else {
+      setStyle({});
+    }
+  }, [theme]);
 
   return (
     <div {...rest} >
-      <div className={"grid grid-cols-1 grid-rows-2 h-full p-5"}>
+      <div className={"grid grid-cols-1 grid-rows-2 h-full p-5"} style={style}>
         <div className={"pages-container"}>
           <Pages ref={pageRef}
                  all={pages}
@@ -340,6 +363,6 @@ function Frame(props) {
       </div>
     </div>
   );
-}
+});
 
 export default Frame;
