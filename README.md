@@ -1,26 +1,20 @@
-# page-replacement-algorithm
+# 页面置换算法模拟器
 
-An Electron application with React
+基于Electron+React+FluentUI的页面置换算法模拟器
 
-## Recommended IDE Setup
-
-- [VSCode](https://code.visualstudio.com/) + [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint) + [Prettier](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode)
-
-## Project Setup
-
-### Install
+### 安装依赖
 
 ```bash
-$ yarn
+$ yarn install
 ```
 
-### Development
+### 运行
 
 ```bash
 $ yarn dev
 ```
 
-### Build
+### 打包
 
 ```bash
 # For windows
