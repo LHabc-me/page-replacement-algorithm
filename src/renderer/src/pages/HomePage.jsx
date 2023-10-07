@@ -84,7 +84,7 @@ const HomePage = (props) => {
 
             <div className={btnContainerClass} style={containerStyle}>
               <div className={"h-full flex flex-col justify-center items-start pl-8"}
-                   onClick={() => window.open("https://gitee.com/lhabc-me/page-replacement-algorithm")}>
+                   onClick={() => window.open("https://gitee.com/kina0630/page-replacement-algorithm")}>
                 <Text size={400}>Gitee</Text>
                 <Text>前往Gitee查看该项目</Text>
               </div>

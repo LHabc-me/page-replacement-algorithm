@@ -13,14 +13,15 @@ const CLOCK = forwardRef((props, ref) => {
   const [workingSet, setWorkingSet] = useState([]);
   const pagesRef = useRef([]);
   const process = useRef(null);
-  useEffect(() => {
+  const reset = () => {
     process.current = new Process({
       logicalPageCount,
       pageSize,
       workingSetSize: size,
       algorithm: "CLOCK"
     });
-  }, [logicalPageCount, pageSize, size]);
+  };
+  useEffect(reset, [logicalPageCount, pageSize, size]);
   const includes = (page) => {
     return workingSet.includes(page);
   };
@@ -43,6 +44,7 @@ const CLOCK = forwardRef((props, ref) => {
   };
   const clear = () => {
     setWorkingSet([]);
+    reset();
   };
   const isFull = () => {
     return workingSet.length === size;
@@ -94,7 +96,8 @@ const CLOCK = forwardRef((props, ref) => {
         console.log("newWorkingSet: " + newWorkingSet);
         // 更新页面的访问位
         // pageEntry.accessed = true;
-        return workingSet[result];
+        console.log("workingSet[result]" + workingSet[result]);
+        return result;
         // } else {
         //   // 如果访问位为1，将访问位置为0，继续访问下一个页面
         //   pageEntry.accessed = false;
@@ -109,7 +112,6 @@ const CLOCK = forwardRef((props, ref) => {
       }
     }
 
-    // console.log(result);
   };
 
   useImperativeHandle(ref, () => ({ access, includes, clear }));
@@ -152,7 +154,7 @@ const CLOCK = forwardRef((props, ref) => {
                                 ref={ref => pagesRef.current[index] = ref}
                                 style={{ height: blockLength, width: blockLength }}
                                 status={"normal"} />
-                      {/*<div>{workingSet.map((page, index) => (<div>*/}
+                      {/*<div>{workingSet.map((page, index) => (<div key={page}>*/}
                       {/*  {index === process.current.pageTable.clockHand ? "⭕" : ""}*/}
                       {/*</div>))}</div>*/}
                     </motion.div>

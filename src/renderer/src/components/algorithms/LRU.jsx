@@ -13,14 +13,16 @@ const LRU = forwardRef((props, ref) => {
   const [workingSet, setWorkingSet] = useState([]);
   const pagesRef = useRef([]);
   const process = useRef(null);
-  useEffect(() => {
+  const reset = () => {
     process.current = new Process({
       logicalPageCount,
       pageSize,
       workingSetSize: size,
       algorithm: "LRU"
     });
-  }, [logicalPageCount, pageSize, size]);
+  };
+
+  useEffect(reset, [logicalPageCount, pageSize, size]);
   const includes = (page) => {
     return workingSet.includes(page);
   };
@@ -43,6 +45,7 @@ const LRU = forwardRef((props, ref) => {
   };
   const clear = () => {
     setWorkingSet([]);
+    reset();
   };
   const isFull = () => {
     return workingSet.length === size;

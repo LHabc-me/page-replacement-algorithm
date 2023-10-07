@@ -8,10 +8,8 @@ class PageTableEntry {
     this.frame = frame; // 页框号（物理块号、帧） -1表示不在工作集内
     this.lastAccessTime = 0; // 最近访问时间 LRU算法使用
     this.totalAccessCount = 0; // 总访问次数 NRU算法使用
-    // this.accessed = false; // 访问位 NRU算法使用
-    // this.modified = false; // 修改位 NRU算法使用
+    this.modified = false; // 修改位 NRU算法使用
     this.accessed = true; // 访问位 CLOCK算法使用
-    // this.clockHand = -1; // 时钟指针 CLOCK算法使用
   }
 }
 
@@ -79,8 +77,7 @@ class Process {
     pageTableEntry.lastAccessTime = Date.now(); // 更新最近访问时间
     pageTableEntry.totalAccessCount++; // 更新总访问次数
     pageTableEntry.accessed = true; // 被访问后，访问位置为1
-
-    // pageTableEntry.clockHand = this.pageTable.clockHand; // 更新时钟指针
+    
 
     try {
       if (this.workingSet.includes(logicalPage)) {// 命中

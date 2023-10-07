@@ -5,46 +5,25 @@ import { Process } from "../../algorithms";
 
 const NUR = forwardRef((props, ref) => {
   /**
-   *     size: config.workingSetSize, // 工作集大小
-   *     logicalPageCount: config.logicalPageCount, // 逻辑页数
-   *     pageSize: config.pageSize // 页面大小
+   *     size: config.workingSetSize,
+   *     logicalPageCount: config.logicalPageCount,
+   *     pageSize: config.pageSize
    */
   const { size, logicalPageCount, pageSize } = props;
   const [workingSet, setWorkingSet] = useState([]);
   const pagesRef = useRef([]);
-
-  const initialPages = {};
-
-  // 在初始化工作集时，为每个页面创建一个页面条目对象
-  for (let i = 0; i < logicalPageCount; i++) {
-    initialPages[i] = {
-      accessed: false,
-      modified: false
-    };
-  }
-
-  // 将初始页面条目对象设置为 pagesRef.current
-  pagesRef.current = initialPages;
-
   const process = useRef(null);
-  useEffect(() => {
+  const reset = () => {
     process.current = new Process({
       logicalPageCount,
       pageSize,
       workingSetSize: size,
-      algorithm: "NUR"
+      algorithm: "CLOCK"
     });
-  }, [logicalPageCount, pageSize, size]);
+  };
+  useEffect(reset, [logicalPageCount, pageSize, size]);
   const includes = (page) => {
     return workingSet.includes(page);
-  };
-  const moveToBack = (page) => {
-    const index = workingSet.indexOf(page);
-    if (index === -1) return;
-    const newWorkingSet = [...workingSet];
-    newWorkingSet.splice(index, 1);
-    newWorkingSet.push(page);
-    setWorkingSet(newWorkingSet);
   };
   const pushBack = (page) => {
     setWorkingSet(s => [...s, page]);
@@ -57,73 +36,46 @@ const NUR = forwardRef((props, ref) => {
   };
   const clear = () => {
     setWorkingSet([]);
+    reset();
   };
   const isFull = () => {
     return workingSet.length === size;
   };
 
   // access: 输入页面号，返回缺页号(没有缺页返回null)
-  // 暂时的想法，后续方案需要调整
-  // 分四种情况，工作集未满且不包含page，工作集未满且包含page，工作集已满且不包含page，工作集已满且包含page
-  // 工作集未满且不包含page，则直接加入
-  // 工作集未满且包含page，则修改page的访问位
-  // 工作集已满且不包含page，则从工作集首项开始逐项访问，直至访问至访问位为0的页面，将page替换为该页面
-  // 工作集已满且包含page，则修改page的访问位
   const access = (page) => {
-    const pageEntry = pagesRef.current[page];
-
-    // 更新页面的 referenced 和 modified 位
-    if (!pageEntry.accessed) {
-      pageEntry.accessed = true;
-    }
-
-    pageEntry.accessed = true; // 标记为已引用
-    pageEntry.modified = false; // 假设页面未修改
-
     const result = process.current.access(page * pageSize);
+    const pageEntry = process.current.pageTable.pageTableEntries[page];
 
-    if (!isFull()) {
-      pushBack(page);
+    if (includes(page)) {
+      // 如果在工作集中，直接更新访问位，并将clockHand指向下一个页面
+      if (!pageEntry.accessed) {
+        pageEntry.accessed = true;
+      }
       return null;
     } else {
-      // 根据 NUR 算法选择要替换的页面
-      let replacePage = null;
-
-      // 遍历工作集，根据页面位选择替换页面
-      for (const workingPage of workingSet) {
-        const workingPageEntry = pagesRef.current[workingPage];
-
-        if (!workingPageEntry.accessed && !workingPageEntry.modified) {
-          // 00 类别的页面，优先选择
-          replacePage = workingPage;
-          break;
-        } else if (!workingPageEntry.accessed && workingPageEntry.modified) {
-          // 01 类别的页面
-          replacePage = workingPage;
-        }
-        // 其他情况继续遍历
-      }
-
-      if (replacePage !== null) {
-        // 找到替换的页面，将其从工作集中移除
-        const index = workingSet.indexOf(replacePage);
-        workingSet.splice(index, 1);
-
-        // 将新页面加入工作集
-        pushBack(page);
+      // 如果不在工作集中，判断工作集是否已满
+      if (isFull()) {
+        // 如果工作集已满，则从clockHand指向的位置开始逐项访问，直至访问至访问位为0的页面，将page替换为该页面
+        const index = workingSet.indexOf(result);
+        console.log("index: " + index);
+        const newWorkingSet = [...workingSet];
+        newWorkingSet.splice(index, 1, page);
+        setWorkingSet(newWorkingSet);
+        console.log("newWorkingSet: " + newWorkingSet);
+        console.log("workingSet[result]" + workingSet[result]);
         return result;
       } else {
-        // 如果没有找到替换的页面，默认选择第一个页面
-        const firstPage = popFront(); // 移除第一个页面
-        pushBack(page); // 将新页面加入工作集
-        return firstPage;
+        // 如果工作集未满，直接将page加入工作集
+        pushBack(page);
+        console.log("CLOCK.jsx中clockHand: " + process.current.pageTable.clockHand);
+        return null;
       }
     }
+
   };
 
-
   useImperativeHandle(ref, () => ({ access, includes, clear }));
-
 
   const blockLength = 36;
   const textStyle = {
@@ -142,6 +94,7 @@ const NUR = forwardRef((props, ref) => {
       <div className={"h-full flex flex-col justify-center"}>
         <div className={"flex flex-row gap-1.5 justify-center flex-wrap"}>
           <div style={textStyle} className={"items-start"}>
+            最旧
           </div>
           <div className={"flex flex-row gap-1.5 justify-center flex-wrap"}
                style={{
@@ -155,28 +108,24 @@ const NUR = forwardRef((props, ref) => {
                       key={page}
                       layout
                       initial={{ opacity: 0, x: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: -20 }}
                       transition={{ duration: 0.2 }}>
-                      <PageItem
-                        pageNumber={page}
-                        ref={ref => pagesRef.current[index] = ref}
-                        style={{
-                          height: blockLength,
-                          width: blockLength,
-                          backgroundColor: pagesRef.current[page].accessed ? "lightblue" : "white",
-                          border: pagesRef.current[page].modified ? "2px solid red" : "2px solid black"
-                        }}
-                        status={"normal"}
-                      />
+                      <PageItem pageNumber={page}
+                                ref={ref => pagesRef.current[index] = ref}
+                                style={{ height: blockLength, width: blockLength }}
+                                status={"normal"} />
+                      {/*<div>{workingSet.map((page, index) => (<div key={page}>*/}
+                      {/*  {index === process.current.pageTable.clockHand ? "⭕" : ""}*/}
+                      {/*</div>))}</div>*/}
                     </motion.div>
                   ))
                 }
-
               </AnimatePresence>
             </AnimateSharedLayout>
           </div>
           <div style={textStyle} className={"items-end"}>
+            最新
           </div>
         </div>
       </div>
