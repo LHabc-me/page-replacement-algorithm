@@ -115,9 +115,6 @@ const NUR = forwardRef((props, ref) => {
                                 ref={ref => pagesRef.current[index] = ref}
                                 style={{ height: blockLength, width: blockLength }}
                                 status={"normal"} />
-                      {/*<div>{workingSet.map((page, index) => (<div key={page}>*/}
-                      {/*  {index === process.current.pageTable.clockHand ? "⭕" : ""}*/}
-                      {/*</div>))}</div>*/}
                     </motion.div>
                   ))
                 }
